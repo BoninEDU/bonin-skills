@@ -1,34 +1,59 @@
 {
-  "name": "ljg-skills",
-  "displayName": "LJG Skills Collection",
-  "description": "Personal Claude Code skills collection for paper reading, content casting, and writing workflows",
-  "version": "1.17.0",
+  "name": "bonin-skills",
   "owner": {
-    "name": "lijigang",
-    "url": "https://github.com/lijigang"
+    "name": "BoninEDU",
+    "email": "boninedu2025@gmail.com"
   },
-  "repository": "https://github.com/lijigang/ljg-skills",
-  "license": "MIT",
-  "keywords": [
-    "skills",
-    "paper-reading",
-    "academic",
-    "content-casting",
-    "visualization",
-    "writing",
-    "productivity"
-  ],
-  "categories": [
-    "Productivity",
-    "Research",
-    "Content Creation"
-  ],
+  "metadata": {
+    "description": "Skills shared by Bonin for improving daily work efficiency",
+    "version": "1.113.0"
+  },
   "plugins": [
     {
-      "name": "ljg-skills",
-      "description": "LJG's personal Claude Code skills collection",
-      "version": "1.17.0",
-      "source": "./"
+      "name": "bonin-skills",
+      "description": "Content generation, AI backends, and utility tools for daily work efficiency",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/bonin-article-illustrator",
+        "./skills/bonin-comic",
+        "./skills/bonin-compress-image",
+        "./skills/bonin-cover-image",
+        "./skills/bonin-danger-gemini-web",
+        "./skills/bonin-danger-x-to-markdown",
+        "./skills/bonin-diagram",
+        "./skills/bonin-format-markdown",
+        "./skills/bonin-imagine",
+        "./skills/bonin-infographic",
+        "./skills/bonin-markdown-to-html",
+        "./skills/bonin-post-to-weibo",
+        "./skills/bonin-post-to-wechat",
+        "./skills/bonin-post-to-x",
+        "./skills/bonin-slide-deck",
+        "./skills/bonin-translate",
+        "./skills/bonin-url-to-markdown",
+        "./skills/bonin-image-cards",
+        "./skills/bonin-youtube-transcript",
+        "./skills/bonin-card",
+        "./skills/bonin-invest",
+        "./skills/bonin-learn",
+        "./skills/bonin-paper",
+        "./skills/bonin-paper-flow",
+        "./skills/bonin-paper-river",
+        "./skills/bonin-plain",
+        "./skills/bonin-present",
+        "./skills/bonin-qa",
+        "./skills/bonin-rank",
+        "./skills/bonin-read",
+        "./skills/bonin-relationship",
+        "./skills/bonin-roundtable",
+        "./skills/bonin-skill-map",
+        "./skills/bonin-think",
+        "./skills/bonin-travel",
+        "./skills/bonin-word",
+        "./skills/bonin-word-flow",
+        "./skills/bonin-writes"
+      ]
     }
   ]
 }

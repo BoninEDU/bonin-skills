@@ -1,13 +1,13 @@
 #!/bin/bash
 # Usage: sync-push.sh <skill-name> <commit-message>
-# Syncs a local ljg-* skill to the repo and pushes.
+# Syncs a local bonin-* skill to the repo and pushes.
 # Auto-bumps patch version in marketplace.json and plugin.json.
 
 set -euo pipefail
 
 SKILL="$1"
 MSG="$2"
-REPO="$HOME/.claude/ljg-skills-repo"
+REPO="$HOME/.claude/bonin-skills-repo"
 LOCAL="$HOME/.claude/skills/$SKILL"
 TARGET="$REPO/skills/$SKILL"
 

@@ -1,0 +1,8 @@
+{
+  "name": "bonin-danger-x-to-markdown-scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "bonin-chrome-cdp": "^0.1.0"
+  }
+}

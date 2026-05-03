@@ -4,7 +4,11 @@
 # 保留根目录文件
 !.gitignore
 !README.md
+!README.zh.md
 !CLAUDE.md
+!USER_MANUAL.md
+!USER_MANUAL.zh.md
+!URL_20260503.md
 
 # 保留插件清单
 !.claude-plugin/
@@ -18,6 +22,15 @@
 !skills/
 !skills/**/
 !skills/**/*
+
+# 保留共享包
+!packages/
+!packages/**/
+!packages/**/*
+
+# 保留截图
+!screenshots/
+!screenshots/**/*
 
 # 排除构建产物
 node_modules/

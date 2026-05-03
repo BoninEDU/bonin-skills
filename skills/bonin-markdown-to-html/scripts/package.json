@@ -1,0 +1,8 @@
+{
+  "name": "bonin-markdown-to-html-scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "bonin-md": "^0.1.0"
+  }
+}

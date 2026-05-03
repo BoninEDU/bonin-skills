@@ -1,12 +1,12 @@
 {
-  "name": "ljg-skills",
-  "version": "1.17.0",
-  "description": "LJG's personal Claude Code skills collection - paper reading, content casting, writing tools",
+  "name": "bonin-skills",
+  "version": "1.113.0",
+  "description": "Bonin's personal Claude Code skills collection - content generation, AI backends, paper reading, content casting, writing tools",
   "author": {
-    "name": "lijigang",
-    "url": "https://github.com/lijigang"
+    "name": "BoninEDU",
+    "url": "https://github.com/BoninEDU"
   },
-  "repository": "https://github.com/lijigang/ljg-skills",
-  "keywords": ["skills", "paper-reading", "content-casting", "writing"],
+  "repository": "https://github.com/BoninEDU/bonin-skills",
+  "keywords": ["skills", "content-generation", "paper-reading", "content-casting", "writing", "productivity"],
   "skills": "./skills"
 }
