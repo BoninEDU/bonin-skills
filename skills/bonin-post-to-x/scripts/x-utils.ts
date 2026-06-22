@@ -95,7 +95,7 @@ function getWslWindowsHome(): string | null {
 
 export function getDefaultProfileDir(): string {
   return resolveSharedChromeProfileDir({
-    envNames: ['bonin_CHROME_PROFILE_DIR', 'X_BROWSER_PROFILE_DIR'],
+    envNames: ['BONIN_CHROME_PROFILE_DIR', 'X_BROWSER_PROFILE_DIR'],
     wslWindowsHome: getWslWindowsHome(),
   });
 }
@@ -218,6 +218,7 @@ async function launchChromeOnce(
 
   try {
     await waitForChromeDebugPort(port, 30_000, { includeLastError: true });
+    chrome.unref();
     return { chrome, port };
   } catch (error) {
     killChrome(chrome);

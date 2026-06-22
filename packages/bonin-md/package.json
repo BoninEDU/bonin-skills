@@ -1,6 +1,7 @@
 {
   "name": "bonin-md",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -37,7 +38,7 @@
     "remark-stringify": "^11.0.0",
     "unified": "^11.0.5"
   },
-  "description": "Shared Markdown rendering and WeChat-friendly HTML utilities for Bonin skills.",
+  "description": "Shared Markdown rendering and WeChat-friendly HTML utilities for bonin skills.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BoninEDU/bonin-skills.git",

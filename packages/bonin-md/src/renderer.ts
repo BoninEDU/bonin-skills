@@ -119,7 +119,6 @@ function wrapInlineCode(value: string): string {
 export function initRenderer(opts: IOpts = {}): RendererAPI {
   const footnotes: [number, string, string][] = [];
   let footnoteIndex = 0;
-  let codeIndex = 0;
   const listOrderedStack: boolean[] = [];
   const listCounters: number[] = [];
   const isBrowser = typeof window !== "undefined";
@@ -208,20 +207,7 @@ export function initRenderer(opts: IOpts = {}): RendererAPI {
 
     code({ text, lang = "" }: Tokens.Code): string {
       if (lang.startsWith("mermaid")) {
-        if (isBrowser) {
-          clearTimeout(codeIndex as any);
-          codeIndex = setTimeout(async () => {
-            const windowRef = typeof window !== "undefined" ? (window as any) : undefined;
-            if (windowRef && windowRef.mermaid) {
-              const mermaid = windowRef.mermaid;
-              await mermaid.run();
-            } else {
-              const mermaid = await import("mermaid");
-              await mermaid.default.run();
-            }
-          }, 0) as any as number;
-        }
-        return `<pre class="mermaid">${text}</pre>`;
+        return `<pre class="mermaid">${escapeHtml(text)}</pre>`;
       }
       const langText = lang.split(" ")[0];
       const isLanguageRegistered = hljs.getLanguage(langText);

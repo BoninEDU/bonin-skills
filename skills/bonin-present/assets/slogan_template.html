@@ -7,9 +7,10 @@
 <style>
   :root {
     --c-black:  #1A1A1A;
-    --c-red:    #E93323;
+    --c-red:    #E63956;
     --c-yellow: #FFD400;
     --c-white:  #FFFFFF;
+    --c-gold:   #FFE082;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -25,7 +26,7 @@
   /* Theme drives every color via single attribute on body.
      Each theme defines: bg/fg pair (default slide), acc-bg/acc-fg pair (emphasis), hl color. */
   body[data-theme="black"]  { --bg: var(--c-black);  --fg: var(--c-white); --acc-bg: var(--c-red);    --acc-fg: var(--c-white); --hl: var(--c-red); }
-  body[data-theme="red"]    { --bg: var(--c-red);    --fg: var(--c-white); --acc-bg: var(--c-black);  --acc-fg: var(--c-white); --hl: var(--c-black); }
+  body[data-theme="red"]    { --bg: var(--c-red);    --fg: var(--c-white); --acc-bg: var(--c-black);  --acc-fg: var(--c-white); --hl: var(--c-gold); }
   body[data-theme="yellow"] { --bg: var(--c-yellow); --fg: var(--c-black); --acc-bg: var(--c-black);  --acc-fg: var(--c-white); --hl: var(--c-red); }
 
   body { background: var(--bg); }
@@ -39,7 +40,7 @@
     display: none;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 6vmin 7vmin;
     background: var(--bg);
     color: var(--fg);
@@ -55,22 +56,23 @@
   .lines {
     display: flex;
     flex-direction: column;
-    gap: 0.02em;
-    line-height: 0.95;
+    gap: 0.15em;
+    line-height: 1.05;
     max-width: 100%;
+    align-items: flex-start;
   }
-  .line { white-space: nowrap; }
+  .line { white-space: nowrap; text-align: left; }
   .line[data-indent="0"] { padding-left: 0; }
   .line[data-indent="1"] { padding-left: 7vmin; }
   .line[data-indent="2"] { padding-left: 16vmin; }
 
-  /* Font-size tiers — bumped ~30% larger for VACAT-grade impact.
+  /* Font-size tiers — v2.1.1 上调 ~30% 适配 16:9 横屏，消除右侧空白。
      Single chars dominate the screen; long lines sweep across with full weight. */
-  .slide[data-len="single"] .lines { font-size: clamp(260px, 64vmin, 880px); }
-  .slide[data-len="short"]  .lines { font-size: clamp(180px, 42vmin, 600px); }
-  .slide[data-len="medium"] .lines { font-size: clamp(110px, 26vmin, 360px); }
-  .slide[data-len="long"]   .lines { font-size: clamp(72px,  15vmin, 220px); }
-  .slide[data-len="xlong"]  .lines { font-size: clamp(48px,  10vmin, 150px); }
+  .slide[data-len="single"] .lines { font-size: clamp(320px, 80vmin, 1100px); }
+  .slide[data-len="short"]  .lines { font-size: clamp(240px, 55vmin, 780px); }
+  .slide[data-len="medium"] .lines { font-size: clamp(150px, 35vmin, 480px); }
+  .slide[data-len="long"]   .lines { font-size: clamp(100px, 22vmin, 320px); }
+  .slide[data-len="xlong"]  .lines { font-size: clamp(64px,  14vmin, 200px); }
 
   /* Footers — subtle, monospace, never compete with main text */
   .pager, .subtitle {

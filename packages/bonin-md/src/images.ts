@@ -23,16 +23,39 @@ export function replaceMarkdownImagesWithPlaceholders(
 } {
   const images: ImagePlaceholder[] = [];
   let imageCounter = 0;
+  let lastIndex = 0;
+  let rewritten = "";
 
-  const rewritten = markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, src) => {
+  const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)|!\[\[([^\]\n]+)\]\]/g;
+  for (const match of markdown.matchAll(imagePattern)) {
+    const fullMatch = match[0];
+    const matchIndex = match.index ?? 0;
+    const markdownAlt = match[1];
+    const markdownSrc = match[2];
+    const wikilinkTarget = match[3];
+    const wikilinkImage = wikilinkTarget
+      ? parseObsidianImageWikilink(wikilinkTarget)
+      : null;
+
+    if (wikilinkTarget && !wikilinkImage) {
+      continue;
+    }
+
+    const originalPath = wikilinkImage?.originalPath ?? markdownSrc ?? "";
+    const alt = wikilinkImage?.alt ?? markdownAlt ?? "";
     const placeholder = `${placeholderPrefix}${++imageCounter}`;
+
+    rewritten += markdown.slice(lastIndex, matchIndex);
     images.push({
       alt,
-      originalPath: src,
+      originalPath,
       placeholder,
     });
-    return placeholder;
-  });
+    rewritten += placeholder;
+    lastIndex = matchIndex + fullMatch.length;
+  }
+
+  rewritten += markdown.slice(lastIndex);
 
   return { images, markdown: rewritten };
 }
@@ -103,10 +126,7 @@ export async function resolveImagePath(
     return localPath;
   }
 
-  const resolved = path.isAbsolute(imagePath)
-    ? imagePath
-    : path.resolve(baseDir, imagePath);
-  return resolveLocalWithFallback(resolved, logLabel);
+  return resolveLocalImagePath(imagePath, baseDir, logLabel);
 }
 
 export async function resolveContentImages(
@@ -127,11 +147,79 @@ export async function resolveContentImages(
   return resolved;
 }
 
-function resolveLocalWithFallback(resolved: string, logLabel: string): string {
+function parseObsidianImageWikilink(target: string): {
+  originalPath: string;
+  alt: string;
+} | null {
+  const separatorIndex = target.indexOf("|");
+  const originalPath = (separatorIndex === -1
+    ? target
+    : target.slice(0, separatorIndex)).trim();
+  const alt = separatorIndex === -1 ? "" : target.slice(separatorIndex + 1).trim();
+
+  if (!hasExplicitImageExtension(originalPath)) {
+    return null;
+  }
+
+  return { originalPath, alt };
+}
+
+function hasExplicitImageExtension(value: string): boolean {
+  return /\.(?:jpe?g|png|gif|webp)(?:[?#].*)?$/i.test(value);
+}
+
+function resolveLocalImagePath(imagePath: string, baseDir: string, logLabel: string): string {
+  const decoded = safeDecodeImagePath(imagePath);
+  const decodedResolved = resolveAgainstBaseDir(decoded, baseDir);
+  const decodedWithFallback = resolveLocalWithFallback(
+    decodedResolved,
+    logLabel,
+    buildAttachmentFallbackPath(decoded, baseDir),
+  );
+
+  if (decoded === imagePath || fs.existsSync(decodedWithFallback)) {
+    return decodedWithFallback;
+  }
+
+  return resolveLocalWithFallback(
+    resolveAgainstBaseDir(imagePath, baseDir),
+    logLabel,
+    buildAttachmentFallbackPath(imagePath, baseDir),
+  );
+}
+
+function resolveLocalWithFallback(
+  resolved: string,
+  logLabel: string,
+  attachmentResolved?: string,
+): string {
   if (fs.existsSync(resolved)) {
     return resolved;
   }
 
+  if (attachmentResolved && fs.existsSync(attachmentResolved)) {
+    logImageFallback(resolved, attachmentResolved, logLabel);
+    return attachmentResolved;
+  }
+
+  const originalAlternative = findExtensionFallback(resolved);
+  if (originalAlternative) {
+    logImageFallback(resolved, originalAlternative, logLabel);
+    return originalAlternative;
+  }
+
+  if (attachmentResolved) {
+    const attachmentAlternative = findExtensionFallback(attachmentResolved);
+    if (attachmentAlternative) {
+      logImageFallback(resolved, attachmentAlternative, logLabel);
+      return attachmentAlternative;
+    }
+  }
+
+  return resolved;
+}
+
+function findExtensionFallback(resolved: string): string | null {
   const ext = path.extname(resolved);
   const base = ext ? resolved.slice(0, -ext.length) : resolved;
   const alternatives = [
@@ -146,11 +234,33 @@ function resolveLocalWithFallback(resolved: string, logLabel: string): string {
 
   for (const alternative of alternatives) {
     if (!fs.existsSync(alternative)) continue;
-    console.error(
-      `[${logLabel}] Image fallback: ${path.basename(resolved)} -> ${path.basename(alternative)}`,
-    );
     return alternative;
   }
 
-  return resolved;
+  return null;
+}
+
+function logImageFallback(fromPath: string, toPath: string, logLabel: string): void {
+  console.error(
+    `[${logLabel}] Image fallback: ${path.basename(fromPath)} -> ${path.basename(toPath)}`,
+  );
+}
+
+function safeDecodeImagePath(imagePath: string): string {
+  try {
+    return decodeURIComponent(imagePath);
+  } catch {
+    return imagePath;
+  }
+}
+
+function resolveAgainstBaseDir(imagePath: string, baseDir: string): string {
+  return path.isAbsolute(imagePath) ? imagePath : path.resolve(baseDir, imagePath);
+}
+
+function buildAttachmentFallbackPath(imagePath: string, baseDir: string): string | undefined {
+  if (path.isAbsolute(imagePath)) {
+    return undefined;
+  }
+  return path.resolve(baseDir, "Attachments", imagePath);
 }

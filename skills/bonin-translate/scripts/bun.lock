@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "baoyu-translate-chunk",
+      "name": "bonin-translate-chunk",
       "dependencies": {
         "markdown-it": "14.1.1",
       },

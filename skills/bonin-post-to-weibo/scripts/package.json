@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "bonin-chrome-cdp": "^0.1.0",
-    "bonin-md": "^0.1.0"
+    "bonin-chrome-cdp": "^0.1.1",
+    "bonin-md": "^0.1.1"
   }
 }

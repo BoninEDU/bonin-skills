@@ -1,26 +1,21 @@
 ---
 name: bonin-paper-flow
-description: "Paper workflow: read papers + cast cards in one go. Takes one or more arxiv links, paper URLs, PDFs, or paper names. For each paper, runs bonin-paper (generates org analysis) then bonin-card -v (generates visual sketchnote PNG). Use when user says '论文流', 'paper flow', '读论文并做卡片', '论文卡片', or provides multiple papers wanting both analysis and cards."
+description: "Paper workflow: read papers + cast 取景框 library cards in one go. Takes one or more arxiv links, paper URLs, PDFs, or paper names. For each paper, runs bonin-paper (generates org analysis) then bonin-library (distills the paper's 取景框 into a 2050 library card PNG). Use when user says '论文流', 'paper flow', '读论文并做卡片', '论文卡片', or provides multiple papers wanting both analysis and cards."
 user_invocable: true
-version: "1.0.2"
+version: "1.1.0"
 ---
 
 # bonin-paper-flow: 论文流
 
-一条命令完成：读论文 → 生成解读 → 铸成卡片。支持多篇并行。
+一条命令完成：读论文 → 生成解读 → 铸成取景框借书卡。支持多篇并行。
 
 ## 模式
 
-**强制 NATIVE 模式。** 本 workflow 是纯 skill 管道（bonin-paper → bonin-card），不需要 Algorithm 的七步流程。直接按下方执行步骤调用 skill，不走 OBSERVE/THINK/PLAN/BUILD/EXECUTE/VERIFY/LEARN。
+**强制 NATIVE 模式。** 本 workflow 是纯 skill 管道（bonin-paper → bonin-library），不需要 Algorithm 的七步流程。直接按下方执行步骤调用 skill，不走 OBSERVE/THINK/PLAN/BUILD/EXECUTE/VERIFY/LEARN。
 
 ## 参数
 
-| 参数 | 说明 |
-|------|------|
-| 无参数 | 对话中已提供的论文链接/文件 |
-| `-l` | 卡片模具改用长图模式（默认 `-v` 视觉笔记） |
-| `-i` | 卡片模具改用信息图模式 |
-| `-c` | 卡片模具改用漫画模式 |
+无 flag。论文来源从对话或命令里取（arxiv URL、PDF 路径、论文名）。每篇论文走 bonin-paper → bonin-library，卡片类型固定为取景框借书卡——bonin-library 只产这一种卡，没有 bonin-card 那套 `-l/-i/-c/-v` 模具可选。
 
 ## 执行
 
@@ -36,9 +31,9 @@ version: "1.0.2"
 
 调用 Skill tool 执行 `bonin-paper`，传入该论文的来源。等待完成，获得生成的 org 文件路径。
 
-**步骤 B — 铸卡片（bonin-card）：**
+**步骤 B — 铸取景框卡（bonin-library）：**
 
-读取步骤 A 生成的 org 文件，调用 Skill tool 执行 `bonin-card`（默认 `-v`，或按用户指定的模具参数），以 org 文件内容为输入。等待完成，获得 PNG 文件路径。
+读取步骤 A 生成的 org 文件——里面已经把这篇论文的命题、内核、它带来的新看世界方式拆透了，这正是 bonin-library 要的「已想透的取景框思想」。把这份思想连同论文标题 / 作者 / arxiv 信息交给 Skill tool 执行 `bonin-library`：走它的输入弹性路径（给了思想就只校验 + 画图，跳过从零提炼），产出取景框借书卡 PNG。等待完成，获得 PNG 路径。
 
 ### 3. 汇总报告
 
@@ -48,16 +43,18 @@ version: "1.0.2"
 ════ 论文流完成 ═══════════════════════
 📄 {论文标题1}
    📝 解读: {org 文件路径}
-   🖼️ 卡片: {PNG 文件路径}
+   🃏 取景框卡: {PNG 文件路径}
 
 📄 {论文标题2}
    📝 解读: {org 文件路径}
-   🖼️ 卡片: {PNG 文件路径}
+   🃏 取景框卡: {PNG 文件路径}
 ...
 ```
 
 ## 关键约束
 
-- 每篇论文的两步必须串行（先 paper 后 card），但多篇论文之间并行
-- bonin-paper 和 bonin-card 各自的质量标准、红线、品味准则不变
-- 卡片内容来自生成的 org 文件，不是原始论文
+- 每篇论文的两步必须串行（先 paper 后 library），但多篇论文之间并行
+- bonin-paper 和 bonin-library 各自的质量标准、红线、品味准则不变
+- 卡片的取景框来自生成的 org 文件（已拆透的命题 + 内核），不是原始论文
+- **论文 ≠ 书，素材降级**：bonin-library 的封面（weread）/ 作者头像（维基）/ 出版社字段是为书设计的。论文走 arxiv：weread 多半搜不到 → 封面落 CSS 占位；arxiv 作者多半不在维基 → 头像省略；书目行改用 arxiv 元数据（作者 · arXiv:ID · 年份）。卡的命在取景框意向画面 + 费曼讲解 + 手绘图，这部分论文完全适配，封面 / 头像缺位不伤核心。
+- **并行隔离 /tmp 竞争**：bonin-library 默认把封面 / 头像写死在 `/tmp/lib_cover.jpg`、`/tmp/lib_avatar.jpg`；多篇并行会互相串图。每个 subagent 必须用唯一路径（如 `/tmp/lib_cover_{slug}.jpg`），渲染后亲眼验图确认没串。

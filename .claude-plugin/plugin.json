@@ -1,12 +1,12 @@
 {
   "name": "bonin-skills",
-  "version": "1.113.0",
-  "description": "Bonin's personal Claude Code skills collection - content generation, AI backends, paper reading, content casting, writing tools",
+  "version": "1.17.35",
+  "description": "BONIN's personal Claude Code skills collection - paper reading, content casting, writing tools",
   "author": {
     "name": "BoninEDU",
     "url": "https://github.com/BoninEDU"
   },
   "repository": "https://github.com/BoninEDU/bonin-skills",
-  "keywords": ["skills", "content-generation", "paper-reading", "content-casting", "writing", "productivity"],
+  "keywords": ["skills", "paper-reading", "content-casting", "writing"],
   "skills": "./skills"
 }

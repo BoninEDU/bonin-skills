@@ -62,6 +62,9 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-learn** | 概念解剖 — 从八个方向切开一个概念（历史、辩证、现象、语言、形式、存在、美感、元反思），压成一句顿悟 |
 | **bonin-paper** | 论文阅读 — 为非学术人士提取论文核心想法，重理解不重批判 |
 | **bonin-paper-river** | 论文溯源 — 倒读法，递归挖前序论文（最多5层）+ 最新进展，从源头讲述问题演化史 |
+| **bonin-book** | 拆书 — 以「问题」为轴心一条线：作者答什么问题 / 之前共识怎么答 / 挪动了什么（delta）/ 结论 / 精神内核，收尾一张 ASCII 参考系图，各流派与作者钉进同一张图 |
+| **bonin-library** | 取景框借书卡 — 一本书 → 一幅「取景框」意向画面 → 一张 2050 图书馆借书卡（PNG）：真实封面 / 作者头像 / 书目；取景框 block 用费曼式讲透这幅意向画面，图解板白底黑墨、精确呈现它一眼即懂（画面含「你」才嵌继刚墨像），卡身强调色从封面动态提取 |
+| **bonin-qa** | 信息提问机 — 把文章/论文/书的核心观点抽成 Q-A 链，Q 切要害，A 四段（结论 / 形式化 / 步骤 / 边界） |
 | **bonin-plain** | 白话引擎 — 把任何内容改写到聪明的十二岁小孩也能懂 |
 | **bonin-rank** | 降秩引擎 — 给一个领域，找出背后不可再少的独立生成器 |
 | **bonin-think** | 追本之箭 — 给一个观点或现象，纵向深钻到不可再分的本质 |
@@ -74,7 +77,9 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-travel** | 旅行研究 — 输入城市名，生成深度文化研究文档（org-mode）+ 便携卡片（PNG） |
 | **bonin-skill-map** | 技能地图 — 扫描所有已安装技能，渲染可视化总览 |
 | **bonin-present** | 演讲铸造器 — 默认高桥流（一页一关键词、奶白底墨字）；`-s` 标语流（VACAT/BIG STUDIOS 风：黑红双色块、ultra-bold、完整断言句撑屏）|
-| **bonin-qa** | 信息提问机 — 把文章/论文/书的核心观点抽成 Q-A 链，Q 切要害，A 四段（结论 / 形式化 / 步骤 / 边界） |
+| **bonin-push** | 推送引擎 — 把本地 `~/.claude/skills/bonin-*` 一键同步到 github repo（master + md 双分支）|
+| **bonin-electron-extract** | Electron 逆向 — 从已安装的 Electron 应用（`.asar`）提取资源与 JavaScript，有 `.js.map` 时还原源码，否则用 Prettier 格式化压缩代码 |
+| **bonin-wechat-summary** | 群聊精华 — 把微信群聊记录提炼成结构化简报（正常版 / 毒舌版），维护跨次运行的群聊历史、群友画像与事实记忆 |
 
 
 ## 工作流
@@ -83,7 +88,7 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 
 | 工作流 | 技能链 | 说明 |
 |--------|--------|------|
-| **bonin-paper-flow** | bonin-paper → bonin-card -c | 读论文 + 做漫画卡片一气呵成 |
+| **bonin-paper-flow** | bonin-paper → bonin-library | 读论文 + 铸取景框借书卡一气呵成 |
 | **bonin-word-flow** | bonin-word → bonin-card -i | 单词深度分析 + 信息图卡片一气呵成 |
 
 ## 输出格式

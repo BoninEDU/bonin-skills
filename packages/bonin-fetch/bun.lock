@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "baoyu-fetch",
+      "name": "bonin-fetch",
       "dependencies": {
         "@mozilla/readability": "^0.6.0",
         "chrome-launcher": "^1.2.1",

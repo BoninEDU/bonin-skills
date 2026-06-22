@@ -5,6 +5,8 @@ export * from "./document.js";
 export * from "./extend-config.js";
 export * from "./html-builder.js";
 export * from "./images.js";
+export * from "./mermaid-preprocess.js";
+export * from "./mermaid-utils.js";
 export * from "./renderer.js";
 export * from "./themes.js";
 export * from "./types.js";
