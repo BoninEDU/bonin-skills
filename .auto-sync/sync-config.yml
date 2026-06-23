@@ -1,0 +1,128 @@
+# Bonin Skills 自动化同步配置
+# Auto-Sync Configuration for bonin-skills
+#
+# 此文件由自动化同步程序读取，定义源仓库、目标仓库、同步规则和审计标准。
+# This file is read by the auto-sync program; defines source/target repos, sync rules, and audit standards.
+
+# ============================================================
+# 源仓库配置 / Source Repositories
+# ============================================================
+sources:
+  - name: baoyu
+    path: "d:\\Repo\\baoyu-skills"
+    # 上次同步的基准 commit（程序会自动更新此字段）
+    # Baseline commit for last sync (auto-updated by the program)
+    baseline_commit: "505a7e1"
+    # 路径映射：baoyu -> bonin（大小写敏感）
+    path_replace:
+      - { from: "baoyu", to: "bonin", case_sensitive: true }
+    # 内容替换规则（顺序执行）
+    content_replacements:
+      - { pattern: "github\\.com/JimLiu/baoyu-skills", replace: "github.com/BoninEDU/bonin-skills" }
+      - { pattern: "JimLiu/baoyu-skills", replace: "BoninEDU/bonin-skills" }
+      - { pattern: "JimLiu", replace: "BoninEDU" }
+      - { pattern: "BAOYU", replace: "BONIN", case_sensitive: true }
+      - { pattern: "Baoyu", replace: "Bonin", case_sensitive: true }
+      - { pattern: "baoyu", replace: "bonin", case_sensitive: true }
+    # 贡献者信息脱敏规则（正则）
+    contributor_patterns:
+      - { pattern: " \\(by @[^)]+\\)", replace: "" }
+      - { pattern: " contributed by @\\S+", replace: "" }
+      - { pattern: " <[^>]+@[^>]+>", replace: "" }
+      - { pattern: "Credit to [^\\n]+", replace: "" }
+
+  - name: ljg
+    path: "d:\\Repo\\ljg-skills"
+    baseline_commit: "0b77aa2"
+    path_replace:
+      - { from: "ljg", to: "bonin", case_sensitive: true }
+    content_replacements:
+      - { pattern: "github\\.com/lijigang/ljg-skills", replace: "github.com/BoninEDU/bonin-skills" }
+      - { pattern: "lijigang/ljg-skills", replace: "BoninEDU/bonin-skills" }
+      - { pattern: "github\\.com/lijigang", replace: "github.com/BoninEDU" }
+      - { pattern: "lijigang", replace: "BoninEDU" }
+      - { pattern: "LJG", replace: "BONIN", case_sensitive: true }
+      - { pattern: "Ljg", replace: "Bonin", case_sensitive: true }
+      - { pattern: "ljg", replace: "bonin", case_sensitive: true }
+      # SSH URL 特殊处理（@ 字符用 \x40 转义）
+      - { pattern: "git\\x40github\\.com:lijigang/ljg-skills\\.git", replace: "git@github.com:BoninEDU/bonin-skills.git" }
+
+# ============================================================
+# 目标仓库配置 / Target Repository
+# ============================================================
+target:
+  path: "d:\\Repo\\bonin-skills"
+  remote: "origin"
+  branch: "master"
+  github_owner: "BoninEDU"
+  github_repo: "bonin-skills"
+
+# ============================================================
+# 同步规则 / Sync Rules
+# ============================================================
+sync:
+  # 跳过的文件模式（正则）
+  skip_patterns:
+    - "^LICENSE$"
+    - "^\\.gitignore$"
+    - "^package-lock\\.json$"
+    - "^bun\\.lockb$"
+    - "^\\.releaserc\\.yml$"
+  # 二进制文件扩展名（直接复制，不做内容转换）
+  binary_extensions:
+    - ".png"
+    - ".webp"
+    - ".jpg"
+    - ".jpeg"
+    - ".gif"
+    - ".ico"
+    - ".svg"
+    - ".lock"
+    - ".lockb"
+    - ".pdf"
+    - ".zip"
+    - ".woff"
+    - ".woff2"
+    - ".ttf"
+    - ".eot"
+  # 是否在同步后自动提交
+  auto_commit: true
+  # 是否在同步后自动推送
+  auto_push: true
+  # 提交信息前缀
+  commit_prefix: "feat: auto-sync from upstream"
+
+# ============================================================
+# 审计规则 / Audit Rules
+# ============================================================
+audit:
+  # 检查所有 SKILL.md 的 YAML front matter
+  check_skill_md: true
+  # 检查残留的作者信息
+  check_author_info: true
+  # 禁止出现的关键词
+  forbidden_keywords:
+    - "JimLiu"
+    - "lijigang"
+    - "baoyu-skills"
+    - "ljg-skills"
+  # 检查 package.json 名称一致性
+  check_package_names: true
+  # 检查 bun.lock 文件
+  check_lock_files: true
+
+# ============================================================
+# 调度配置 / Schedule
+# ============================================================
+schedule:
+  # 每周执行一次（Windows 任务计划程序触发）
+  # 每周一早上 6:00 执行
+  weekly: true
+  # 日志文件路径
+  log_file: "d:\\Repo\\bonin-skills\\.auto-sync\\sync.log"
+  # 日志保留天数
+  log_retention_days: 30
+  # 失败重试次数
+  retry_count: 3
+  # 重试间隔（秒）
+  retry_interval_seconds: 60

@@ -32,6 +32,10 @@
 !screenshots/
 !screenshots/**/*
 
+# 保留自动化同步系统
+!.auto-sync/
+!.auto-sync/**/*
+
 # 排除构建产物
 node_modules/
 .DS_Store
