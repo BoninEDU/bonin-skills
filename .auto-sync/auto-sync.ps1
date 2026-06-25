@@ -89,6 +89,8 @@ function Transform-Content {
         $Content = $Content -creplace 'BAOYU', 'BONIN'
         $Content = $Content -creplace 'Baoyu', 'Bonin'
         $Content = $Content -creplace 'baoyu', 'bonin'
+        # 中文名脱敏
+        $Content = $Content -replace '宝玉', 'Bonin'
         # 贡献者脱敏
         $Content = $Content -replace ' \(by [^)\r\n]+\)', ''
         $Content = $Content -replace ' contributed by [^\s,]+', ''
@@ -103,6 +105,9 @@ function Transform-Content {
         $Content = $Content -creplace 'LJG', 'BONIN'
         $Content = $Content -creplace 'Ljg', 'Bonin'
         $Content = $Content -creplace 'ljg', 'bonin'
+        # 中文名脱敏（先替换"李继刚"，再替换"继刚"）
+        $Content = $Content -replace '李继刚', 'Bonin AIGC'
+        $Content = $Content -replace '继刚', 'Bonin '
         # SSH URL
         $at = [char]0x40
         $sshPattern = 'git' + $at + 'github\.com:lijigang/ljg-skills\.git'
@@ -206,7 +211,7 @@ function Invoke-Audit {
 
     # 2. 检查残留作者信息
     Write-Log "Checking for residual author info..."
-    $forbidden = @("JimLiu", "lijigang", "baoyu-skills", "ljg-skills")
+    $forbidden = @("JimLiu", "lijigang", "baoyu-skills", "ljg-skills", "继刚", "李继刚", "宝玉")
     foreach ($kw in $forbidden) {
         $matches = @(Select-String -Path (Join-Path $boninRoot "**\*") -Pattern $kw -SimpleMatch -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -notmatch "\\.git\\" -and $_.Path -notmatch "node_modules" -and $_.Path -notmatch "\\.auto-sync\\" })

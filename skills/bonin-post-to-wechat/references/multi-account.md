@@ -18,11 +18,11 @@ default_theme: default
 default_color: blue
 
 accounts:
-  - name: 宝玉的技术分享
+  - name: Bonin的技术分享
     alias: bonin
     default: true
     default_publish_method: api
-    default_author: 宝玉
+    default_author: Bonin
     need_open_comment: 1
     only_fans_can_comment: 0
     app_id: your_wechat_app_id
@@ -112,11 +112,11 @@ default_color: blue
 default_publish_method: browser   # browser remains the default
 
 accounts:
-  - name: 宝玉的技术分享
+  - name: Bonin的技术分享
     alias: bonin
     default: true
     default_publish_method: api
-    default_author: 宝玉
+    default_author: Bonin
     app_id: your_wechat_app_id
     app_secret: your_wechat_app_secret
   - name: AI工具集

@@ -65,7 +65,7 @@ Found → read, parse, apply. Not found → run first-time setup (`references/co
 default_theme: default
 default_color: blue
 default_publish_method: browser
-default_author: 宝玉
+default_author: Bonin
 need_open_comment: 1
 only_fans_can_comment: 0
 chrome_profile_path: /path/to/chrome/profile

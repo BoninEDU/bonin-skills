@@ -2,17 +2,15 @@
 
 [English](./README.md) | 中文
 
-宝玉分享的 AI Agent 技能集（适用于 Claude Code、Codex 等），提升日常工作效率。
+Bonin AIGC 分享的 AI Agent 技能集（适用于 Claude Code、Codex 等），提升日常工作效率。
 
-## 作者的图书
+## Bonin AIGC
 
-<img width="500" height="500" alt="图解 Skill —— AI 提效实战指南" src="https://github.com/user-attachments/assets/6caef6a2-6f11-490e-a43b-e810df8e9354" />
+> **成就超级个体和团队** — Empower Super-Individuals and Super-Teams
 
-作者的图书《图解 Skill —— AI 提效实战指南》系统讲解如何设计、编写、安装和迭代 Skill，并配有完整示例、提示词、插图生成工作流和章节配套资源。
-
-- 官方配套仓库：[BoninEDU/Illustrated-Agent-Skills](https://github.com/BoninEDU/Illustrated-Agent-Skills)
-- 购买链接：[京东购买](https://u.jd.com/RDY9YwC)
-- 电子书购买链接：https://www.ituring.com.cn/book/3616
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- 配套仓库：[BoninEDU/Illustrated-Agent-Skills](https://github.com/BoninEDU/Illustrated-Agent-Skills)
 
 ## 前置要求
 
@@ -698,11 +696,11 @@ default_color: blue
 
 # 账号列表
 accounts:
-  - name: 宝玉的技术分享
+  - name: Bonin的技术分享
     alias: bonin
     default: false
     default_publish_method: api
-    default_author: 宝玉
+    default_author: Bonin
     need_open_comment: 1
     only_fans_can_comment: 0
     app_id: 你的微信 AppID

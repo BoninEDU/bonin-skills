@@ -1,8 +1,8 @@
 # ============================================================
-# Bonin Skills 自动化同步 - Windows 任务计划程序安装
+# Bonin Skills Auto-Sync - Windows Scheduled Task Installer
 # Installs a weekly scheduled task to run auto-sync every Monday 06:00
 #
-# 用法：
+# Usage:
 #   powershell -ExecutionPolicy Bypass -File install-scheduled-task.ps1
 #   powershell -ExecutionPolicy Bypass -File install-scheduled-task.ps1 -Uninstall
 # ============================================================
@@ -26,7 +26,7 @@ if ($Uninstall) {
     exit 0
 }
 
-# 检查脚本是否存在
+# Check if script exists
 if (-not (Test-Path $scriptPath)) {
     Write-Host "Error: auto-sync.ps1 not found at: $scriptPath"
     exit 1
@@ -37,36 +37,21 @@ Write-Host "Script path: $scriptPath"
 Write-Host "Schedule: Every Monday at 06:00"
 Write-Host ""
 
-# 创建任务动作
-$action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`""
+# Create task action
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`""
 
-# 创建触发器：每周一 06:00
+# Create trigger: every Monday at 06:00
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 6am
 
-# 创建设置：允许强制启动，失败重试
-$settings = New-ScheduledTaskSettingsSet `
-    -AllowStartIfOnBatteries `
-    -DontStopIfGoingOnBatteries `
-    -StartWhenAvailable `
-    -RestartCount 3 `
-    -RestartInterval (New-TimeSpan -Minutes 30) `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+# Create settings: allow start on batteries, retry on failure
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 30) -ExecutionTimeLimit (New-TimeSpan -Hours 2)
 
-# 注册任务（以当前用户运行，使用最高权限）
+# Register task (run as current user with highest privileges)
 try {
-    # 先删除已存在的任务
+    # Remove existing task first
     Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 
-    Register-ScheduledTask `
-        -TaskName $taskName `
-        -Action $action `
-        -Trigger $trigger `
-        -Settings $settings `
-        -Description "Weekly auto-sync of bonin-skills from upstream repositories (baoyu-skills, ljg-skills)" `
-        -RunLevel Highest `
-        -Force | Out-Null
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Description "Weekly auto-sync of bonin-skills from upstream repositories (baoyu-skills, ljg-skills)" -Force | Out-Null
 
     Write-Host "Scheduled task installed successfully!"
     Write-Host ""

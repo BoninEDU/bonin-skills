@@ -106,6 +106,9 @@ audit:
     - "lijigang"
     - "baoyu-skills"
     - "ljg-skills"
+    - "继刚"
+    - "李继刚"
+    - "宝玉"
   # 检查 package.json 名称一致性
   check_package_names: true
   # 检查 bun.lock 文件
