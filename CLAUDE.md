@@ -2,6 +2,9 @@
 
 Claude Code marketplace plugin providing AI-powered content generation skills. Version: **2.0.0**.
 
+> **Bonin AIGC** — *Empower Super-Individuals and Super-Teams*
+> Website: [boninaigc.top](https://www.boninaigc.top) | Email: boninaigc@gmail.com | GitHub: [BoninEDU](https://github.com/BoninEDU)
+
 ## Architecture
 
 Skills are exposed through the single `bonin-skills` plugin in `.claude-plugin/marketplace.json` (which defines plugin metadata, version, and skill paths). The repo docs still group them into three logical areas:
@@ -110,3 +113,16 @@ All skills MUST use `bonin-` prefix. Details: [docs/creating-skills.md](docs/cre
 | Chrome profile platform paths | [docs/chrome-profile.md](docs/chrome-profile.md) |
 | Comic style maintenance | [docs/comic-style-maintenance.md](docs/comic-style-maintenance.md) |
 | ClawHub/OpenClaw publishing | [docs/publishing.md](docs/publishing.md) |
+
+## Auto-Sync System
+
+This repo is kept in sync with upstream skill repositories by an automated system under [.auto-sync/](.auto-sync/README.md). The system:
+
+1. **Monitors upstream** skill repos weekly (Windows Task Scheduler, every Monday 06:00)
+2. **Sanitizes content** — strips original author names (English & Chinese), repo URLs, emails, and replaces paths (`baoyu` → `bonin`, `ljg` → `bonin`)
+3. **Audits** — checks `SKILL.md` front matter, package names, lock files, and forbidden keywords (`JimLiu`, `lijigang`, `baoyu-skills`, `ljg-skills`, `继刚`, `李继刚`, `宝玉`)
+4. **Auto-pushes** to GitHub after audit passes
+
+Run manually: `powershell -ExecutionPolicy Bypass -File .auto-sync/auto-sync.ps1` (use `-DryRun` for preview, `-Force` to ignore baseline).
+
+Full documentation: [.auto-sync/README.md](.auto-sync/README.md)

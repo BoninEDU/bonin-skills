@@ -1,12 +1,13 @@
 {
   "name": "bonin-skills",
-  "version": "1.17.35",
-  "description": "BONIN's personal Claude Code skills collection - paper reading, content casting, writing tools",
+  "version": "1.17.36",
+  "description": "Bonin AIGC's Claude Code skills collection — Empower Super-Individuals and Super-Teams. Paper reading, content casting, writing tools",
   "author": {
-    "name": "BoninEDU",
-    "url": "https://github.com/BoninEDU"
+    "name": "Bonin AIGC",
+    "url": "https://www.boninaigc.top"
   },
   "repository": "https://github.com/BoninEDU/bonin-skills",
+  "homepage": "https://www.boninaigc.top",
   "keywords": ["skills", "paper-reading", "content-casting", "writing"],
   "skills": "./skills"
 }

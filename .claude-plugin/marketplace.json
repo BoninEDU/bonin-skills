@@ -1,13 +1,14 @@
 {
   "name": "bonin-skills",
-  "displayName": "BONIN Skills Collection",
-  "description": "Personal Claude Code skills collection for paper reading, content casting, and writing workflows",
-  "version": "1.17.35",
+  "displayName": "Bonin AIGC Skills Collection",
+  "description": "Bonin AIGC — Empower Super-Individuals and Super-Teams. Claude Code skills for paper reading, content casting, and writing workflows",
+  "version": "1.17.36",
   "owner": {
-    "name": "BoninEDU",
-    "url": "https://github.com/BoninEDU"
+    "name": "Bonin AIGC",
+    "url": "https://www.boninaigc.top"
   },
   "repository": "https://github.com/BoninEDU/bonin-skills",
+  "homepage": "https://www.boninaigc.top",
   "license": "MIT",
   "keywords": [
     "skills",
@@ -26,8 +27,8 @@
   "plugins": [
     {
       "name": "bonin-skills",
-      "description": "BONIN's personal Claude Code skills collection",
-      "version": "1.17.35",
+      "description": "Bonin AIGC's Claude Code skills collection — Empower Super-Individuals and Super-Teams",
+      "version": "1.17.36",
       "source": "./"
     }
   ]

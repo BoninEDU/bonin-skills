@@ -1,6 +1,8 @@
 # Bonin Skills 用户手册
 
-> 版本：1.113.0 | 仓库：[github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | 邮箱：boninedu2025@gmail.com
+> 版本：1.114.0 | 仓库：[github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | 官网：[boninaigc.top](https://www.boninaigc.top) | 邮箱：boninaigc@gmail.com
+
+> **Bonin AIGC** — *成就超级个体和团队*
 
 ---
 
@@ -29,6 +31,14 @@
 **Bonin Skills** 是一套为 Claude Code 打造的技能集合插件，涵盖内容生成、AI 图像生成、论文阅读、内容发布、写作工具、知识分析等多个领域。每个技能都是自包含的独立目录，可单独安装到 `~/.claude/skills/` 以扩展 Claude Code 的能力。
 
 本插件通过 Claude Code Marketplace 分发，也可手动安装使用。
+
+### 关于 Bonin AIGC
+
+**Bonin AIGC** 的使命是 **成就超级个体和团队**。本技能集是其在 AI 原生生产力生态中的开源贡献之一。
+
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- GitHub：[BoninEDU](https://github.com/BoninEDU)
 
 ---
 
@@ -754,4 +764,4 @@ cp -r skills/bonin-* ~/.claude/skills/
 
 ---
 
-> 📖 Bonin Skills v1.113.0 | © BoninEDU | [GitHub](https://github.com/BoninEDU/bonin-skills)
+> 📖 Bonin Skills v1.114.0 | © Bonin AIGC | [官网](https://www.boninaigc.top) | [GitHub](https://github.com/BoninEDU/bonin-skills) | boninaigc@gmail.com

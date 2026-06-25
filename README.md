@@ -2,6 +2,14 @@
 
 我的 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 自定义技能集。
 
+## Bonin AIGC
+
+> **成就超级个体和团队** — Empower Super-Individuals and Super-Teams
+
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- GitHub：[BoninEDU](https://github.com/BoninEDU)
+
 ## 安装
 
 使用 [skills CLI](https://github.com/vercel-labs/skills)（基于 `npx`）一行安装：

@@ -1,6 +1,8 @@
 # Bonin Skills 自动化同步系统
 
 > Automated monitoring, syncing, and auditing system for bonin-skills
+>
+> **Bonin AIGC** — *Empower Super-Individuals and Super-Teams* | [boninaigc.top](https://www.boninaigc.top)
 
 ## 概述
 
@@ -172,12 +174,29 @@ Start-ScheduledTask -TaskName 'BoninSkillsAutoSync'
 |----|---------|
 | `JimLiu` | 替换为 `BoninEDU` |
 | `lijigang` | 替换为 `BoninEDU` |
+| `宝玉` | 替换为 `Bonin` |
+| `继刚` | 替换为 `Bonin` |
+| `李继刚` | 替换为 `Bonin AIGC` |
 | `github.com/JimLiu/baoyu-skills` | 替换为 `github.com/BoninEDU/bonin-skills` |
 | `github.com/lijigang/ljg-skills` | 替换为 `github.com/BoninEDU/bonin-skills` |
 | `(by @username)` | 移除 |
 | `contributed by @username` | 移除 |
 | `<email@example.com>` | 移除 |
 | `Credit to ...` | 移除 |
+
+### 审计禁止关键词
+
+同步后的文件中不得出现以下关键词（审计阶段强制检查）：
+
+| 关键词 | 类别 |
+|--------|------|
+| `JimLiu` | 原作者 GitHub ID |
+| `lijigang` | 原作者 GitHub ID |
+| `baoyu-skills` | 源仓库名 |
+| `ljg-skills` | 源仓库名 |
+| `继刚` | 原作者中文名 |
+| `李继刚` | 原作者中文全名 |
+| `宝玉` | 原作者中文名 |
 
 ## 日志
 

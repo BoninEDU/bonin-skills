@@ -1,6 +1,8 @@
 # Bonin Skills — User Manual
 
-> Version: 1.113.0 | Repository: [github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | Email: boninedu2025@gmail.com
+> Version: 1.114.0 | Repository: [github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | Website: [boninaigc.top](https://www.boninaigc.top) | Email: boninaigc@gmail.com
+
+> **Bonin AIGC** — *Empower Super-Individuals and Super-Teams*
 
 ---
 
@@ -29,6 +31,14 @@
 **Bonin Skills** is a Claude Code marketplace plugin providing a comprehensive collection of AI-powered skills for content generation, image creation, paper reading, content publishing, writing, and knowledge analysis. Each skill is a self-contained directory that can be independently installed to `~/.claude/skills/` to extend Claude Code's capabilities.
 
 The plugin is distributed through the Claude Code Marketplace and can also be installed manually.
+
+### About Bonin AIGC
+
+**Bonin AIGC** is on a mission to **Empower Super-Individuals and Super-Teams**. This skills collection is one of its open-source contributions to the AI-native productivity ecosystem.
+
+- Website: [https://www.boninaigc.top](https://www.boninaigc.top)
+- Email: boninaigc@gmail.com
+- GitHub: [BoninEDU](https://github.com/BoninEDU)
 
 ---
 
@@ -754,4 +764,4 @@ Then restart Claude Code.
 
 ---
 
-> 📖 Bonin Skills v1.113.0 | © BoninEDU | [GitHub](https://github.com/BoninEDU/bonin-skills)
+> 📖 Bonin Skills v1.114.0 | © Bonin AIGC | [Website](https://www.boninaigc.top) | [GitHub](https://github.com/BoninEDU/bonin-skills) | boninaigc@gmail.com
