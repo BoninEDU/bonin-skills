@@ -65,6 +65,7 @@ const DEFAULT_PROVIDER_RATE_LIMITS: Record<Provider, ProviderRateLimit> = {
   seedream: { concurrency: 3, startIntervalMs: 1100 },
   azure: { concurrency: 3, startIntervalMs: 1100 },
   "codex-cli": { concurrency: 1, startIntervalMs: 2000 },
+  atlas: { concurrency: 1, startIntervalMs: 2000 },
   agnes: { concurrency: 3, startIntervalMs: 1100 },
 };
 
@@ -80,7 +81,7 @@ Options:
   --image <path>            Output image path (required in single-image mode)
   --batchfile <path>        JSON batch file for multi-image generation
   --jobs <count>            Worker count for batch mode (default: auto, max from config, built-in default 10)
-  --provider google|openai|openrouter|dashscope|zai|minimax|replicate|jimeng|seedream|azure|codex-cli|agnes  Force provider (auto-detect by default)
+  --provider google|openai|openrouter|dashscope|zai|minimax|replicate|jimeng|seedream|azure|codex-cli|atlas|agnes  Force provider (auto-detect by default)
   -m, --model <id>          Model ID
   --ar <ratio>              Aspect ratio (e.g., 16:9, 1:1, 4:3)
   --size <WxH>              Size (e.g., 1024x1024)
@@ -110,7 +111,7 @@ Batch file format:
 
 Behavior:
   - Batch mode automatically runs in parallel when pending tasks >= 2
-  - Each image retries automatically up to 3 attempts
+  - Each image retries automatically up to 3 attempts, except Atlas Cloud generation POSTs (one attempt)
   - Batch summary reports success count, failure count, and per-image errors
   - Replicate currently supports single-image save semantics only; --n must stay at 1
 
@@ -164,6 +165,11 @@ Environment variables:
   BONIN_CODEX_IMAGEGEN_TIMEOUT_MS  Per-attempt codex exec timeout for codex-cli provider (default: 300000)
   BONIN_CODEX_IMAGEGEN_RETRIES  Codex-side retry attempts on retryable errors (default: 2)
   BONIN_CODEX_IMAGEGEN_LOG_FILE  Append JSONL diagnostic log for codex-cli provider
+  ATLASCLOUD_API_KEY       Atlas Cloud API key (explicit opt-in only)
+  ATLASCLOUD_IMAGE_MODEL   Default Atlas Cloud model (openai/gpt-image-2/text-to-image)
+  ATLASCLOUD_GENERATION_API_BASE  Atlas Cloud generation API base (https://api.atlascloud.ai/api/v1)
+  ATLASCLOUD_POLL_INTERVAL_MS  Initial Atlas result polling interval (default: 2000)
+  ATLASCLOUD_POLL_TIMEOUT_MS   Atlas result polling timeout (default: 300000)
 
 Env file load order: CLI args > EXTEND.md > process.env > <cwd>/.bonin-skills/.env > ~/.bonin-skills/.env`);
 }
@@ -269,6 +275,7 @@ export function parseArgs(argv: string[]): CliArgs {
         v !== "seedream" &&
         v !== "azure" &&
         v !== "codex-cli" &&
+        v !== "atlas" &&
         v !== "agnes"
       ) {
         throw new Error(`Invalid provider: ${v}`);
@@ -449,6 +456,7 @@ export function parseSimpleYaml(yaml: string): Partial<ExtendConfig> {
           seedream: null,
           azure: null,
           "codex-cli": null,
+          atlas: null,
           agnes: null,
         };
         currentKey = "default_model";
@@ -480,6 +488,7 @@ export function parseSimpleYaml(yaml: string): Partial<ExtendConfig> {
           key === "seedream" ||
           key === "azure" ||
           key === "codex-cli" ||
+          key === "atlas" ||
           key === "agnes"
         )
       ) {
@@ -501,6 +510,7 @@ export function parseSimpleYaml(yaml: string): Partial<ExtendConfig> {
           key === "seedream" ||
           key === "azure" ||
           key === "codex-cli" ||
+          key === "atlas" ||
           key === "agnes"
         )
       ) {
@@ -669,10 +679,11 @@ export function getConfiguredProviderRateLimits(
     seedream: { ...DEFAULT_PROVIDER_RATE_LIMITS.seedream },
     azure: { ...DEFAULT_PROVIDER_RATE_LIMITS.azure },
     "codex-cli": { ...DEFAULT_PROVIDER_RATE_LIMITS["codex-cli"] },
+    atlas: { ...DEFAULT_PROVIDER_RATE_LIMITS.atlas },
     agnes: { ...DEFAULT_PROVIDER_RATE_LIMITS.agnes },
   };
 
-  for (const provider of ["replicate", "google", "openai", "openrouter", "dashscope", "zai", "minimax", "jimeng", "seedream", "azure", "codex-cli", "agnes"] as Provider[]) {
+  for (const provider of ["replicate", "google", "openai", "openrouter", "dashscope", "zai", "minimax", "jimeng", "seedream", "azure", "codex-cli", "atlas", "agnes"] as Provider[]) {
     const envPrefix = `BONIN_IMAGE_GEN_${provider.toUpperCase().replace(/-/g, "_")}`;
     const extendLimit = extendConfig.batch?.provider_limits?.[provider];
     configured[provider] = {
@@ -893,6 +904,7 @@ async function loadProviderModule(provider: Provider): Promise<ProviderModule> {
   if (provider === "seedream") return (await import("./providers/seedream")) as ProviderModule;
   if (provider === "azure") return (await import("./providers/azure")) as ProviderModule;
   if (provider === "codex-cli") return (await import("./providers/codex-cli")) as ProviderModule;
+  if (provider === "atlas") return (await import("./providers/atlas")) as ProviderModule;
   if (provider === "agnes") return (await import("./providers/agnes")) as ProviderModule;
   return (await import("./providers/openai")) as ProviderModule;
 }
@@ -926,6 +938,7 @@ function getModelForProvider(
     if (provider === "seedream" && extendConfig.default_model.seedream) return extendConfig.default_model.seedream;
     if (provider === "azure" && extendConfig.default_model.azure) return extendConfig.default_model.azure;
     if (provider === "codex-cli" && extendConfig.default_model["codex-cli"]) return extendConfig.default_model["codex-cli"];
+    if (provider === "atlas" && extendConfig.default_model.atlas) return extendConfig.default_model.atlas;
     if (provider === "agnes" && extendConfig.default_model.agnes) return extendConfig.default_model.agnes;
   }
   return providerModule.getDefaultModel();
@@ -1069,8 +1082,11 @@ async function writeImage(outputPath: string, imageData: Uint8Array): Promise<vo
 
 async function generatePreparedTask(task: PreparedTask): Promise<TaskResult> {
   console.error(`Using ${task.provider} / ${task.model} for ${task.id}`);
+  const modelEnv = task.provider === "atlas"
+    ? "ATLASCLOUD_IMAGE_MODEL"
+    : `${task.provider.toUpperCase()}_IMAGE_MODEL`;
   console.error(
-    `Switch model: --model <id> | EXTEND.md default_model.${task.provider} | env ${task.provider.toUpperCase()}_IMAGE_MODEL`
+    `Switch model: --model <id> | EXTEND.md default_model.${task.provider} | env ${modelEnv}`
   );
 
   let attempts = 0;
@@ -1090,7 +1106,7 @@ async function generatePreparedTask(task: PreparedTask): Promise<TaskResult> {
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const canRetry = attempts < MAX_ATTEMPTS && isRetryableGenerationError(error);
+      const canRetry = task.provider !== "atlas" && attempts < MAX_ATTEMPTS && isRetryableGenerationError(error);
       if (canRetry) {
         console.error(`[${task.id}] Attempt ${attempts}/${MAX_ATTEMPTS} failed, retrying...`);
         continue;
@@ -1162,7 +1178,7 @@ async function runBatchTasks(
   const acquireProvider = createProviderGate(providerRateLimits);
   const workerCount = getWorkerCount(tasks.length, jobs, maxWorkers);
   console.error(`Batch mode: ${tasks.length} tasks, ${workerCount} workers, parallel mode enabled.`);
-  for (const provider of ["replicate", "google", "openai", "openrouter", "dashscope", "zai", "minimax", "jimeng", "seedream", "azure", "codex-cli", "agnes"] as Provider[]) {
+  for (const provider of ["replicate", "google", "openai", "openrouter", "dashscope", "zai", "minimax", "jimeng", "seedream", "azure", "codex-cli", "atlas", "agnes"] as Provider[]) {
     const limit = providerRateLimits[provider];
     console.error(`- ${provider}: concurrency=${limit.concurrency}, startIntervalMs=${limit.startIntervalMs}`);
   }

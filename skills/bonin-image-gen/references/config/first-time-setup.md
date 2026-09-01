@@ -59,6 +59,8 @@ options:
     description: "MiniMax image generation with subject-reference character workflows"
   - label: "Replicate"
     description: "Curated Replicate image families - nano-banana-2, Seedream, and Wan image models"
+  - label: "Atlas Cloud"
+    description: "Explicit opt-in asynchronous image generation through Atlas Cloud"
   - label: "Agnes"
     description: "Sapiens AI Agnes - optimized for high information density, complex layouts, reference-image support"
 ```
@@ -137,6 +139,18 @@ options:
     description: "Best default for posters, diagrams, and text-heavy images"
   - label: "cogview-4-250304"
     description: "Legacy Z.AI image model on the same endpoint"
+```
+
+### Question 2f: Default Atlas Cloud Model
+
+Only show if user selected Atlas Cloud.
+
+```yaml
+header: "Atlas Model"
+question: "Default Atlas Cloud image model route?"
+options:
+  - label: "GPT Image 2 (Recommended)"
+    description: "openai/gpt-image-2/text-to-image through the asynchronous Atlas image API"
 ```
 
 ### Question 3: Default Quality

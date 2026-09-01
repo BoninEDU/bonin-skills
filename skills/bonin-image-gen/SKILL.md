@@ -1,6 +1,6 @@
 ---
 name: bonin-image-gen
-description: AI image generation with OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream, Replicate and Agnes APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.
+description: AI image generation with OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream, Replicate, Atlas Cloud and Agnes APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.
 version: 2.1.0
 metadata:
   openclaw:
@@ -13,7 +13,7 @@ metadata:
 
 # Image Generation (AI SDK)
 
-Official API-based image generation. Supports OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope (阿里通义万象), Z.AI GLM-Image, MiniMax, Jimeng (即梦), Seedream (豆包), Replicate and Agnes.
+Official API-based image generation. Supports OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope (阿里通义万象), Z.AI GLM-Image, MiniMax, Jimeng (即梦), Seedream (豆包), Replicate, Atlas Cloud and Agnes.
 
 ## User Input Tools
 
@@ -84,6 +84,9 @@ ${BUN_X} {baseDir}/scripts/main.ts --prompt "A cat" --image out.png --provider o
 # Codex CLI (uses logged-in Codex subscription — no OPENAI_API_KEY required; requires `codex` on PATH)
 ${BUN_X} {baseDir}/scripts/main.ts --prompt "A cat" --image out.png --provider codex-cli --ar 16:9
 
+# Atlas Cloud (explicit opt-in; generation POSTs are never retried)
+${BUN_X} {baseDir}/scripts/main.ts --prompt "A cat" --image out.png --provider atlas --model openai/gpt-image-2/text-to-image
+
 # Batch mode
 ${BUN_X} {baseDir}/scripts/main.ts --batchfile batch.json --jobs 4
 
@@ -111,7 +114,7 @@ When the user wants a person/object preserved from reference images:
 | `--image <path>` | Output image path (required in single-image mode) |
 | `--batchfile <path>` | JSON batch file for multi-image generation |
 | `--jobs <count>` | Worker count for batch mode (default: auto, max from config, built-in default 10) |
-| `--provider google\|openai\|azure\|openrouter\|dashscope\|zai\|minimax\|jimeng\|seedream\|replicate\|codex-cli\|agnes` | Force provider (default: auto-detect; `codex-cli` is never auto-selected — must be pinned via CLI or EXTEND.md) |
+| `--provider google\|openai\|azure\|openrouter\|dashscope\|zai\|minimax\|jimeng\|seedream\|replicate\|codex-cli\|atlas\|agnes` | Force provider (default: auto-detect; `codex-cli` and `atlas` are never auto-selected — pin them via CLI or EXTEND.md) |
 | `--model <id>`, `-m` | Model ID — see provider references for defaults and allowed values |
 | `--ar <ratio>` | Aspect ratio (`16:9`, `1:1`, `4:3`, …) |
 | `--size <WxH>` | Explicit size (e.g., `1024x1024`; for `gpt-image-2`, width/height must be multiples of 16, max edge 3840px, ratio no wider than 3:1) |
@@ -136,7 +139,9 @@ When the user wants a person/object preserved from reference images:
 | `REPLICATE_API_TOKEN` | Replicate API token |
 | `JIMENG_ACCESS_KEY_ID`, `JIMENG_SECRET_ACCESS_KEY` | Jimeng (即梦) Volcengine credentials |
 | `ARK_API_KEY` | Seedream (豆包) Volcengine ARK API key |
-| `<PROVIDER>_IMAGE_MODEL` | Per-provider model override (`OPENAI_IMAGE_MODEL`, `GOOGLE_IMAGE_MODEL`, `DASHSCOPE_IMAGE_MODEL`, `ZAI_IMAGE_MODEL`/`BIGMODEL_IMAGE_MODEL`, `MINIMAX_IMAGE_MODEL`, `OPENROUTER_IMAGE_MODEL`, `REPLICATE_IMAGE_MODEL`, `JIMENG_IMAGE_MODEL`, `SEEDREAM_IMAGE_MODEL`, `AGNES_IMAGE_MODEL`) |
+| `ATLASCLOUD_API_KEY` | Atlas Cloud API key; Atlas remains explicit opt-in |
+| `ATLASCLOUD_GENERATION_API_BASE` | Atlas Cloud generation API base (default `https://api.atlascloud.ai/api/v1`) |
+| `<PROVIDER>_IMAGE_MODEL` | Per-provider model override (`OPENAI_IMAGE_MODEL`, `GOOGLE_IMAGE_MODEL`, `DASHSCOPE_IMAGE_MODEL`, `ZAI_IMAGE_MODEL`/`BIGMODEL_IMAGE_MODEL`, `MINIMAX_IMAGE_MODEL`, `OPENROUTER_IMAGE_MODEL`, `REPLICATE_IMAGE_MODEL`, `JIMENG_IMAGE_MODEL`, `SEEDREAM_IMAGE_MODEL`, `ATLASCLOUD_IMAGE_MODEL`, `AGNES_IMAGE_MODEL`) |
 | `AZURE_OPENAI_DEPLOYMENT` (alias `AZURE_OPENAI_IMAGE_MODEL`) | Azure default deployment |
 | `<PROVIDER>_BASE_URL` | Per-provider endpoint override |
 | `AZURE_API_VERSION` | Azure image API version (default `2025-04-01-preview`) |
@@ -207,6 +212,7 @@ Each provider has its own quirks (model families, size rules, ref support, limit
 | OpenRouter (multimodal models, `/chat/completions` flow) | `references/providers/openrouter.md` |
 | Replicate (nano-banana, Seedream, Wan) | `references/providers/replicate.md` |
 | Codex CLI (wraps bundled `scripts/codex-imagegen/`; Codex login, no `OPENAI_API_KEY`) | `references/providers/codex-cli.md` |
+| Atlas Cloud (asynchronous text-to-image, explicit opt-in) | `references/providers/atlas.md` |
 | Agnes (agnes-image-2.1-flash, reference-image support) | `references/providers/agnes.md` |
 
 ## Provider Selection
@@ -216,6 +222,7 @@ Each provider has its own quirks (model families, size rules, ref support, limit
 3. Only one API key present → use that provider
 4. Multiple keys → default priority: Google → OpenAI → Azure → OpenRouter → DashScope → Z.AI → MiniMax → Replicate → Jimeng → Seedream → Agnes
 5. `codex-cli` is **never auto-selected** — set `default_provider: codex-cli` in EXTEND.md or pass `--provider codex-cli`. It spawns `codex exec` via the bundled `scripts/codex-imagegen/main.ts` TS entrypoint (run with `bun`) and uses the user's Codex subscription (no `OPENAI_API_KEY`). Requires `codex` on `PATH` with an active `codex login`.
+6. `atlas` is **never auto-selected** — set `default_provider: atlas` or pass `--provider atlas`. This keeps existing provider defaults unchanged and prevents an available Atlas key from silently changing routing.
 
 ## Quality Presets
 
@@ -256,13 +263,13 @@ Rule of thumb: once prompt files are saved and the task is "generate all of thes
 - Default worker count is automatic, capped by config, built-in default 10
 - Provider-specific throttling applies only in batch mode; defaults are tuned for throughput while avoiding RPM bursts
 - Override with `--jobs <count>`
-- Each image retries up to 3 attempts
+- Each image retries up to 3 attempts, except Atlas Cloud generation POSTs, which run exactly once
 - Final output includes success count, failure count, and per-image failure reasons
 
 ## Error Handling
 
 - Missing API key → error with setup instructions
-- Generation failure → auto-retry up to 3 attempts per image
+- Generation failure → auto-retry up to 3 attempts per image; Atlas Cloud generation POSTs are never retried
 - Invalid aspect ratio → warning, proceed with default
 - Reference images with unsupported provider/model → error with fix hint
 

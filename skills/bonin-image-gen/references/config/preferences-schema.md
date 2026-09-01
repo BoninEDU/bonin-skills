@@ -11,7 +11,7 @@ description: EXTEND.md YAML schema for bonin-image-gen user preferences
 ---
 version: 1
 
-default_provider: null      # google|openai|azure|openrouter|dashscope|zai|minimax|replicate|jimeng|seedream|codex-cli|agnes|null (null = auto-detect; codex-cli is never auto-detected — pin it here or via --provider)
+default_provider: null      # google|openai|azure|openrouter|dashscope|zai|minimax|replicate|jimeng|seedream|codex-cli|atlas|agnes|null (null = auto-detect; codex-cli and atlas are never auto-detected)
 
 default_quality: null       # normal|2k|null (null = use default: 2k)
 
@@ -31,6 +31,7 @@ default_model:
   minimax: null             # e.g., "image-01"
   replicate: null           # e.g., "google/nano-banana-2"
   codex-cli: null           # Logical label only — Codex image_gen has no user-selectable model. Default: "codex-image-gen"
+  atlas: null               # e.g., "openai/gpt-image-2/text-to-image"
   agnes: null               # e.g., "agnes-image-2.1-flash"
 
 batch:
@@ -63,6 +64,9 @@ batch:
     codex-cli:
       concurrency: 1
       start_interval_ms: 2000
+    atlas:
+      concurrency: 1
+      start_interval_ms: 2000
     agnes:
       concurrency: 3
       start_interval_ms: 1100
@@ -88,6 +92,7 @@ batch:
 | `default_model.minimax` | string\|null | null | MiniMax default model |
 | `default_model.replicate` | string\|null | null | Replicate default model |
 | `default_model.codex-cli` | string\|null | null | Codex-CLI logical label (Codex image_gen has no user-selectable model) |
+| `default_model.atlas` | string\|null | null | Atlas Cloud default model route |
 | `default_model.agnes` | string\|null | null | Agnes default model |
 | `batch.max_workers` | int\|null | 10 | Batch worker cap |
 | `batch.provider_limits.<provider>.concurrency` | int\|null | provider default | Max simultaneous requests per provider |
