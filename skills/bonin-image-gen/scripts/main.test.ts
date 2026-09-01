@@ -125,6 +125,31 @@ test("parseArgs falls back to positional prompt and rejects invalid provider", (
   );
 });
 
+test("Atlas Cloud remains explicit opt-in even when its key is present", (t) => {
+  useEnv(t, {
+    ATLASCLOUD_API_KEY: "atlas-key",
+    GOOGLE_API_KEY: null,
+    GEMINI_API_KEY: null,
+    OPENAI_API_KEY: null,
+    AZURE_OPENAI_API_KEY: null,
+    AZURE_OPENAI_BASE_URL: null,
+    OPENROUTER_API_KEY: null,
+    DASHSCOPE_API_KEY: null,
+    ZAI_API_KEY: null,
+    BIGMODEL_API_KEY: null,
+    MINIMAX_API_KEY: null,
+    REPLICATE_API_TOKEN: null,
+    JIMENG_ACCESS_KEY_ID: null,
+    JIMENG_SECRET_ACCESS_KEY: null,
+    ARK_API_KEY: null,
+    AGNES_API_KEY: null,
+  });
+
+  assert.equal(parseArgs(["--provider", "atlas"]).provider, "atlas");
+  assert.equal(detectProvider(makeArgs({ provider: "atlas" })), "atlas");
+  assert.throws(() => detectProvider(makeArgs()), /No API key found/);
+});
+
 test("validateReferenceImages can skip remote URLs for providers that support them", async () => {
   await validateReferenceImages(["https://example.com/ref.png"], { allowRemoteUrls: true });
 
