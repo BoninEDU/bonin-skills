@@ -16,7 +16,12 @@ metadata:
 
 > **⚠️ Sandbox restriction**
 >
-> wx-cli reads from `~/.wx-cli/` (config, cache, daemon socket) and from WeChat's data directory (`~/Library/Containers/com.tencent.xinWeChat/` on macOS). Both paths are outside Claude Code's default sandbox. Every `wx` command in this skill needs to run with `dangerouslyDisableSandbox: true` from the start — don't waste a sandbox attempt first. The user can use `/sandbox` to view/edit restrictions.
+> wx-cli reads from `~/.wx-cli/` (config, cache, daemon socket) and from WeChat's data directory. Platform paths:
+> - **macOS**: `~/Library/Containers/com.tencent.xinWeChat/`
+> - **Windows**: `%APPDATA%\Tencent\WeChat\` (or `%USERPROFILE%\Documents\WeChat Files\` for older versions)
+> - **Linux**: `~/.local/share/Tencent/WeChat/` (if applicable)
+>
+> Both paths are outside Claude Code's default sandbox. Every `wx` command in this skill needs to run with `dangerouslyDisableSandbox: true` from the start — don't waste a sandbox attempt first. The user can use `/sandbox` to view/edit restrictions.
 
 ## User Input Tools
 
@@ -96,7 +101,7 @@ For option 2, scan the sessions for any private/group thread the user has sent i
 **Step B — Confirm with one `AskUserQuestion` call (batched), pre-filling whatever auto-discovery found:**
 
 - `self_wxid` (e.g., `wxid_abc123`) — fall-back hint: the user can find it with `wx contacts --query "<own nickname>"`, or by inspecting any of their own sent messages in `wx sessions --json`
-- `self_display` (e.g., `宝玉`) — how they want their messages attributed
+- `self_display` (e.g., `Bonin`) — how they want their messages attributed
 - `default_version` — pick one of `normal` / `roast` / `both`
 - `data_root` — where digest folders live. Default: `{project_root}/wechat`. Enter a custom absolute path (e.g. `~/Documents/wechat-digests`) or leave blank for default.
 - Save location — pick one of project / XDG / home
@@ -232,7 +237,7 @@ See [references/profiles.md](references/profiles.md) for the full file format.
 
 ### Step 3.8: Detect existing in-chat digests (optional)
 
-Some users (e.g., the original 宝玉 workflow) post digests directly into the group as messages. If we don't notice these, the new digest will re-cover the same ground.
+Some users (e.g., the original Bonin workflow) post digests directly into the group as messages. If we don't notice these, the new digest will re-cover the same ground.
 
 Scan the fetched messages for signals of a prior in-chat digest:
 

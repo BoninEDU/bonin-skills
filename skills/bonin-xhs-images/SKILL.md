@@ -9,6 +9,8 @@ metadata:
 
 # Image Card Series Generator
 
+> **⚠️ Deprecated**: This skill is superseded by [`bonin-image-cards`](../bonin-image-cards), which offers a broader range of visual styles and layouts. Kept functional for backward compatibility — new integrations should use `bonin-image-cards`.
+
 Break down complex content into eye-catching image card series with multiple style options.
 
 ## User Input Tools

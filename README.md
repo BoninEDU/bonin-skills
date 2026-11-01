@@ -2,6 +2,14 @@
 
 我的 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 自定义技能集。
 
+## Bonin AIGC
+
+> **成就超级个体和团队** — Empower Super-Individuals and Super-Teams
+
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- GitHub：[BoninEDU](https://github.com/BoninEDU)
+
 ## 安装
 
 使用 [skills CLI](https://github.com/vercel-labs/skills)（基于 `npx`）一行安装：
@@ -63,7 +71,7 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-paper** | 论文阅读 — 为非学术人士提取论文核心想法，重理解不重批判 |
 | **bonin-paper-river** | 论文溯源 — 倒读法，递归挖前序论文（最多5层）+ 最新进展，从源头讲述问题演化史 |
 | **bonin-book** | 拆书 — 以「问题」为轴心一条线：作者答什么问题 / 之前共识怎么答 / 挪动了什么（delta）/ 结论 / 精神内核，收尾一张 ASCII 参考系图，各流派与作者钉进同一张图 |
-| **bonin-library** | 取景框借书卡 — 一本书 → 一幅「取景框」意向画面 → 一张 2050 图书馆借书卡（PNG）：真实封面 / 作者头像 / 书目；取景框 block 用费曼式讲透这幅意向画面，图解板白底黑墨、精确呈现它一眼即懂（画面含「你」才嵌继刚墨像），卡身强调色从封面动态提取 |
+| **bonin-library** | 取景框借书卡 — 一本书 → 一幅「取景框」意向画面 → 一张 2050 图书馆借书卡（PNG）：真实封面 / 作者头像 / 书目；取景框 block 用费曼式讲透这幅意向画面，图解板白底黑墨、精确呈现它一眼即懂（画面含「你」才嵌 Bonin 墨像），卡身强调色从封面动态提取 |
 | **bonin-qa** | 信息提问机 — 把文章/论文/书的核心观点抽成 Q-A 链，Q 切要害，A 四段（结论 / 形式化 / 步骤 / 边界） |
 | **bonin-plain** | 白话引擎 — 把任何内容改写到聪明的十二岁小孩也能懂 |
 | **bonin-rank** | 降秩引擎 — 给一个领域，找出背后不可再少的独立生成器 |
@@ -80,6 +88,8 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-push** | 推送引擎 — 把本地 `~/.claude/skills/bonin-*` 一键同步到 github repo（master + md 双分支）|
 | **bonin-electron-extract** | Electron 逆向 — 从已安装的 Electron 应用（`.asar`）提取资源与 JavaScript，有 `.js.map` 时还原源码，否则用 Prettier 格式化压缩代码 |
 | **bonin-wechat-summary** | 群聊精华 — 把微信群聊记录提炼成结构化简报（正常版 / 毒舌版），维护跨次运行的群聊历史、群友画像与事实记忆 |
+| **bonin-book-to-skill** | 书→技能 — 把任何技术书籍转化为可验证、可安装的 Claude Code / agent Skill（保留翻译漂移契约与主机清单锁定行，56 个测试文件全量迁移） |
+| **bonin-handraw-style** | 手绘风格提示词引擎 — 367 种编号画风（#001–#367）× 36 组主题色（C-01–C-36）× 170 种排版图型，双语提示词组装，15 个子技能 + 离线画廊 + 自校验库契约 |
 
 
 ## 工作流

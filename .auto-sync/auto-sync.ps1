@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # Bonin Skills 自动化同步程序
 # Auto-Sync Program for bonin-skills
 #
@@ -8,6 +8,13 @@
 #   3. 更新文档
 #   4. 执行全面代码审计
 #   5. 提交并推送到 GitHub
+#
+# 2026-11 extension: also syncs book-to-skill -> skills/bonin-book-to-skill/
+#                    and handraw-style -> skills/bonin-handraw-style/ (dest_prefix mapping).
+#                    Baselines for the two new sources live in baselines.json
+#                    (auto-advanced after a successful commit).
+#                    Rollback support: see rollback.ps1 (revert sync commits /
+#                    restore skill dirs / rewind baselines).
 #
 # 用法：
 #   powershell -ExecutionPolicy Bypass -File auto-sync.ps1
@@ -35,6 +42,57 @@ $boninRoot = "d:\Repo\bonin-skills"
 $baoyuBaseline = "505a7e1"
 $ljgBaseline = "0b77aa2"
 
+# ------------------------------------------------------------
+# Sources added 2026-11 (additive, backward compatible)
+# ------------------------------------------------------------
+$bookRoot = "d:\Repo\book-to-skill"
+$handrawRoot = "d:\Repo\handraw-style"
+
+# Initial baselines = upstream HEAD at migration time (2026-11-01).
+# Live baselines are read from baselines.json at runtime (auto-advanced).
+$bookInitialBaseline = "7540eefbe74933f5fc84c86becac52486b347778"
+$handrawInitialBaseline = "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d"
+
+# dest_prefix: upstream repo root maps under this prefix inside bonin-skills
+$bookDestPrefix = "skills/bonin-book-to-skill"
+$handrawDestPrefix = "skills/bonin-handraw-style"
+
+# Source-specific skip patterns = files excluded at migration time
+# (upstream-only promo / packaging / repo metadata, never synced)
+$bookSkipPatterns = @(
+    "^\.github/",
+    "^BACKERS\.md$",
+    "^CONTRIBUTING\.md$",
+    "^LICENSE\.md$",
+    "^SECURITY\.md$",
+    "^SECURITY-NOTICE\.md$",
+    "^README\.md$",
+    "^README\.ru\.md$",
+    "^README\.zh-CN\.md$",
+    "^CLAUDE\.md$",
+    "^mkdocs\.yml$",
+    "^cliff\.toml$",
+    "^overrides/",
+    "^docs/index\.md$",
+    "^docs/404\.md$",
+    "^docs/CNAME$",
+    "^docs/robots\.txt$",
+    "^docs/assets/"
+)
+$handrawSkipPatterns = @(
+    "^\.github/",
+    "^README\.md$",
+    "^README_en\.md$",
+    "^RELEASE_AUDIT\.md$",
+    "^build_workbuddy_release\.py$",
+    "^scripts/workbuddy_check_audit\.py$",
+    "^scripts/workbuddy_midnight_resubmit\.py$",
+    "^scripts/sync_to_static\.py$",
+    "^scripts/discourse_client\.py$",
+    "^scripts/audit_release\.py$",
+    "^scripts/package_skill\.py$"
+)
+
 $binaryExts = @(".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".lock", ".lockb", ".pdf", ".zip", ".woff", ".woff2", ".ttf", ".eot")
 $skipPatterns = @("^LICENSE$", "^\.gitignore$", "^package-lock\.json$", "^bun\.lockb$", "^\.releaserc\.yml$")
 
@@ -57,6 +115,65 @@ function Exit-With-Error {
     Write-Log -Message $Message -Level "ERROR"
     Write-Log -Message "Sync failed. Elapsed: $((Get-Date) - $scriptStart)" -Level "ERROR"
     exit 1
+}
+
+# ============================================================
+# Baseline state (baselines.json) - added 2026-11
+# Applied to the two new sources only; baoyu/ljg keep their
+# hardcoded baselines (legacy behavior untouched).
+# ============================================================
+
+$script:BaselinesFile = Join-Path $PSScriptRoot "baselines.json"
+
+function Get-Source-Baseline {
+    param([string]$Name, [string]$Initial)
+    if (Test-Path $script:BaselinesFile) {
+        try {
+            $json = Get-Content -Path $script:BaselinesFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            $entry = $json.$Name
+            if ($entry -and $entry.baseline) { return [string]$entry.baseline }
+        }
+        catch {
+            Write-Log "WARN: baselines.json unreadable, using initial baseline for [$Name]" -Level "WARN"
+        }
+    }
+    return $Initial
+}
+
+function Update-Source-Baseline {
+    param([string]$Name, [string]$Commit, [string]$Initial)
+    $state = [ordered]@{}
+    if (Test-Path $script:BaselinesFile) {
+        try {
+            $raw = Get-Content -Path $script:BaselinesFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            foreach ($p in $raw.PSObject.Properties) {
+                $state[$p.Name] = @{
+                    initial    = [string]$p.Value.initial
+                    previous   = [string]$p.Value.previous
+                    baseline   = [string]$p.Value.baseline
+                    updated_at = [string]$p.Value.updated_at
+                }
+            }
+        }
+        catch {
+            Write-Log "WARN: baselines.json unreadable, recreating it" -Level "WARN"
+        }
+    }
+    if ($state.Contains($Name)) {
+        $state[$Name].previous = $state[$Name].baseline
+        $state[$Name].baseline = $Commit
+    }
+    else {
+        $state[$Name] = @{
+            initial  = $Initial
+            previous = $Initial
+            baseline = $Commit
+        }
+    }
+    $state[$Name].updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+    $jsonOut = $state | ConvertTo-Json -Depth 4
+    [System.IO.File]::WriteAllText($script:BaselinesFile, $jsonOut, [System.Text.UTF8Encoding]::new($false))
+    Write-Log "  Baseline advanced [$Name] -> $Commit"
 }
 
 # ============================================================
@@ -109,6 +226,56 @@ function Transform-Content {
         $sshReplacement = 'git' + $at + 'github.com:BoninEDU/bonin-skills.git'
         $Content = $Content -replace $sshPattern, $sshReplacement
     }
+    elseif ($Source -eq "book") {
+        # R1-R3: upstream GitHub URLs (longest first)
+        $Content = $Content -replace 'github\.com/virgiliojr94/book-to-skill', 'github.com/BoninEDU/bonin-skills'
+        $Content = $Content -replace 'virgiliojr94/book-to-skill', 'BoninEDU/bonin-skills'
+        $Content = $Content -replace 'github\.com/virgiliojr94', 'github.com/BoninEDU'
+        # R4: upstream author account
+        $Content = $Content -replace 'virgiliojr94', 'BoninEDU'
+        # R7: brand/title forms (case-sensitive, must run BEFORE the generic
+        # hyphen form below, otherwise titles would be lowercased).
+        # Negative lookbehind keeps re-runs idempotent: already-migrated
+        # text like "Bonin Book-to-Skill" must not be prefixed twice.
+        $Content = $Content -creplace '(?<!Bonin )Book-to-Skill', 'Bonin Book-to-Skill'
+        $Content = $Content -creplace '(?<!BONIN-)BOOK-TO-SKILL', 'BONIN-BOOK-TO-SKILL'
+        $Content = $Content -creplace 'Booklin', 'Bonin'
+        $Content = $Content -creplace 'booklin', 'bonin'
+        # R5: python package name (underscore form, lookbehind = idempotent)
+        $Content = $Content -creplace '(?<!bonin_)book_to_skill', 'bonin_book_to_skill'
+        # R6: CLI / skill name (hyphen form, lookbehind = idempotent)
+        $Content = $Content -creplace '(?<!bonin-)book-to-skill', 'bonin-book-to-skill'
+        # R8: email leftovers
+        $Content = $Content -replace ' <[^>]+@[^>]+>', ''
+    }
+    elseif ($Source -eq "handraw") {
+        # H1/H2: upstream domains -> Bonin site (longest first)
+        $Content = $Content -replace 'static\.handraw-style\.com', 'www.boninaigc.top'
+        $Content = $Content -replace 'img\.handraw-style\.com', 'www.boninaigc.top'
+        $Content = $Content -replace 'handraw-style\.com', 'www.boninaigc.top'
+        # H3: upstream GitHub URL
+        $Content = $Content -replace 'github\.com/yang0/handraw-style', 'github.com/BoninEDU/bonin-skills'
+        # H7: gitee mirror (MUST run before H4: the bare author-id rule
+        # below would rewrite the URL before these specific patterns match)
+        $gat = [char]0x40
+        $giteeSshPattern = 'git' + $gat + 'gitee\.com:yang02010/handraw-style\.git'
+        $giteeSshReplace = 'git' + $gat + 'github.com:BoninEDU/bonin-skills.git'
+        $Content = $Content -replace $giteeSshPattern, $giteeSshReplace
+        $Content = $Content -replace 'gitee\.com:yang02010/handraw-style', 'github.com/BoninEDU/bonin-skills'
+        $Content = $Content -replace 'gitee\.com/yang02010/handraw-style', 'github.com/BoninEDU/bonin-skills'
+        # H4: upstream author identifiers (longest first)
+        $Content = $Content -replace 'yang02010', 'Bonin'
+        $Content = $Content -replace 'yang0/handraw-style', 'BoninEDU/bonin-skills'
+        $Content = $Content -replace '\byang0\b', 'Bonin'
+        # H5: upstream studio brand
+        $Content = $Content -replace 'HandRaw Style Studio', 'Bonin AIGC'
+        # H6: third-party marketplace endpoint
+        $Content = $Content -replace 'open\.workbuddy\.cn', 'www.boninaigc.top'
+        # SKILL.md frontmatter name line ONLY.
+        # The inner sub-skill dir skills/handdraw-style-prompter/ keeps its
+        # name on purpose (install layout dependency) and must NOT be rewritten.
+        $Content = $Content -replace '(?m)^name:\s*handdraw-style-prompter\s*$', 'name: bonin-handraw-style'
+    }
 
     return $Content
 }
@@ -121,6 +288,14 @@ function Map-Path {
     elseif ($Source -eq "ljg") {
         return $RelativePath -creplace 'ljg', 'bonin'
     }
+    elseif ($Source -eq "book") {
+        # package dir rename only: book_to_skill/ -> bonin_book_to_skill/
+        return ($RelativePath -creplace '^book_to_skill/', 'bonin_book_to_skill/')
+    }
+    elseif ($Source -eq "handraw") {
+        # no inner rewrite; dest prefix is applied by Sync-File
+        return $RelativePath
+    }
     return $RelativePath
 }
 
@@ -129,10 +304,20 @@ function Map-Path {
 # ============================================================
 
 function Sync-File {
-    param([string]$SrcRoot, [string]$RelPath, [string]$Source)
+    param(
+        [string]$SrcRoot,
+        [string]$RelPath,
+        [string]$Source,
+        # 2026-11 additions (backward compatible: empty defaults = legacy behavior)
+        [string]$DestPrefix = "",
+        [string[]]$SourceSkipPatterns = @()
+    )
 
     $srcFile = Join-Path $SrcRoot $RelPath
     $destRelPath = Map-Path -RelativePath $RelPath -Source $Source
+    if ($DestPrefix -ne "") {
+        $destRelPath = "$DestPrefix/$destRelPath"
+    }
     $destFile = Join-Path $boninRoot $destRelPath
 
     if (-not (Test-Path $srcFile)) {
@@ -143,6 +328,13 @@ function Sync-File {
     foreach ($pattern in $skipPatterns) {
         if ($RelPath -match $pattern) {
             Write-Log "  SKIP (pattern): $RelPath"
+            return $false
+        }
+    }
+
+    foreach ($pattern in $SourceSkipPatterns) {
+        if ($RelPath -match $pattern) {
+            Write-Log "  SKIP (source pattern): $RelPath"
             return $false
         }
     }
@@ -206,7 +398,8 @@ function Invoke-Audit {
 
     # 2. 检查残留作者信息
     Write-Log "Checking for residual author info..."
-    $forbidden = @("JimLiu", "lijigang", "baoyu-skills", "ljg-skills")
+    # forbidden keywords: legacy sources + 2026-11 sources (all verified zero-match repo-wide)
+    $forbidden = @("JimLiu", "lijigang", "baoyu-skills", "ljg-skills", "virgiliojr94", "booklin", "yang02010", "handraw-style.com", "HandRaw Style Studio", "open.workbuddy.cn")
     foreach ($kw in $forbidden) {
         $matches = @(Select-String -Path (Join-Path $boninRoot "**\*") -Pattern $kw -SimpleMatch -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -notmatch "\\.git\\" -and $_.Path -notmatch "node_modules" -and $_.Path -notmatch "\\.auto-sync\\" })
@@ -263,6 +456,9 @@ Write-Log "========================================"
 $totalSynced = 0
 $totalSkipped = 0
 $hasChanges = $false
+$syncedSources = @()
+$bookNewHead = $null
+$handrawNewHead = $null
 
 # 处理 baoyu-skills
 Write-Log ""
@@ -278,6 +474,7 @@ if (Test-Path $baoyuRoot) {
 
         if ($changedFiles.Count -gt 0 -or $Force) {
             $hasChanges = $true
+            $syncedSources += "baoyu"
             $synced = 0
             $skipped = 0
             foreach ($file in $changedFiles) {
@@ -311,6 +508,7 @@ if (Test-Path $ljgRoot) {
 
         if ($changedFiles.Count -gt 0 -or $Force) {
             $hasChanges = $true
+            $syncedSources += "ljg"
             $synced = 0
             $skipped = 0
             foreach ($file in $changedFiles) {
@@ -328,6 +526,78 @@ if (Test-Path $ljgRoot) {
 }
 else {
     Write-Log "Source repo not found: $ljgRoot" -Level "WARN"
+}
+
+# Process book-to-skill (added 2026-11)
+Write-Log ""
+Write-Log "=== SOURCE: book-to-skill ==="
+if (Test-Path $bookRoot) {
+    $bookBaseline = Get-Source-Baseline -Name "book-to-skill" -Initial $bookInitialBaseline
+    $currentHead = Get-Repo-Head -RepoPath $bookRoot
+    Write-Log "Baseline: $bookBaseline"
+    Write-Log "Current HEAD: $currentHead"
+
+    if ($currentHead -and ($currentHead -ne $bookBaseline -or $Force)) {
+        $changedFiles = Get-Changed-Files -RepoPath $bookRoot -FromCommit $bookBaseline
+        Write-Log "Changed files: $($changedFiles.Count)"
+
+        if ($changedFiles.Count -gt 0 -or $Force) {
+            $hasChanges = $true
+            $syncedSources += "book-to-skill"
+            $synced = 0
+            $skipped = 0
+            foreach ($file in $changedFiles) {
+                $result = Sync-File -SrcRoot $bookRoot -RelPath $file -Source "book" -DestPrefix $bookDestPrefix -SourceSkipPatterns $bookSkipPatterns
+                if ($result) { $synced++ } else { $skipped++ }
+            }
+            $totalSynced += $synced
+            $totalSkipped += $skipped
+            Write-Log "book-to-skill: $synced synced, $skipped skipped"
+            $bookNewHead = $currentHead
+        }
+    }
+    else {
+        Write-Log "No changes since last sync"
+    }
+}
+else {
+    Write-Log "Source repo not found: $bookRoot" -Level "WARN"
+}
+
+# Process handraw-style (added 2026-11)
+Write-Log ""
+Write-Log "=== SOURCE: handraw-style ==="
+if (Test-Path $handrawRoot) {
+    $handrawBaseline = Get-Source-Baseline -Name "handraw-style" -Initial $handrawInitialBaseline
+    $currentHead = Get-Repo-Head -RepoPath $handrawRoot
+    Write-Log "Baseline: $handrawBaseline"
+    Write-Log "Current HEAD: $currentHead"
+
+    if ($currentHead -and ($currentHead -ne $handrawBaseline -or $Force)) {
+        $changedFiles = Get-Changed-Files -RepoPath $handrawRoot -FromCommit $handrawBaseline
+        Write-Log "Changed files: $($changedFiles.Count)"
+
+        if ($changedFiles.Count -gt 0 -or $Force) {
+            $hasChanges = $true
+            $syncedSources += "handraw-style"
+            $synced = 0
+            $skipped = 0
+            foreach ($file in $changedFiles) {
+                $result = Sync-File -SrcRoot $handrawRoot -RelPath $file -Source "handraw" -DestPrefix $handrawDestPrefix -SourceSkipPatterns $handrawSkipPatterns
+                if ($result) { $synced++ } else { $skipped++ }
+            }
+            $totalSynced += $synced
+            $totalSkipped += $skipped
+            Write-Log "handraw-style: $synced synced, $skipped skipped"
+            $handrawNewHead = $currentHead
+        }
+    }
+    else {
+        Write-Log "No changes since last sync"
+    }
+}
+else {
+    Write-Log "Source repo not found: $handrawRoot" -Level "WARN"
 }
 
 # 修复 bun.lock
@@ -356,9 +626,21 @@ if ($hasChanges -and -not $DryRun) {
     Write-Log ""
     Write-Log "=== COMMITTING ==="
     git -C $boninRoot add -A 2>&1 | Out-Null
-    $commitMsg = "feat: auto-sync from upstream - $totalSynced files synced"
+    $sourceTag = if ($syncedSources.Count -gt 0) { $syncedSources -join ', ' } else { "no source" }
+    $commitMsg = "feat: auto-sync from upstream ($sourceTag) - $totalSynced files synced"
     git -C $boninRoot commit -m $commitMsg 2>&1 | Out-Null
     Write-Log "Committed: $commitMsg"
+
+    # Advance new-source baselines after a successful commit (added 2026-11).
+    # Kept after the audit gate so failed runs retry the same range next week.
+    if ($bookNewHead) {
+        Update-Source-Baseline -Name "book-to-skill" -Commit $bookNewHead -Initial $bookInitialBaseline
+        $bookNewHead = $null
+    }
+    if ($handrawNewHead) {
+        Update-Source-Baseline -Name "handraw-style" -Commit $handrawNewHead -Initial $handrawInitialBaseline
+        $handrawNewHead = $null
+    }
 
     # 推送（重试 3 次）
     Write-Log ""

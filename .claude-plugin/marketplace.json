@@ -2,7 +2,7 @@
   "name": "bonin-skills",
   "displayName": "BONIN Skills Collection",
   "description": "Personal Claude Code skills collection for paper reading, content casting, and writing workflows",
-  "version": "1.17.35",
+  "version": "2.5.0",
   "owner": {
     "name": "BoninEDU",
     "url": "https://github.com/BoninEDU"
@@ -27,7 +27,7 @@
     {
       "name": "bonin-skills",
       "description": "BONIN's personal Claude Code skills collection",
-      "version": "1.17.35",
+      "version": "2.5.0",
       "source": "./"
     }
   ]

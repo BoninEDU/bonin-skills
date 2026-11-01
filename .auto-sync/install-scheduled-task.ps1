@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # Bonin Skills 自动化同步 - Windows 任务计划程序安装
 # Installs a weekly scheduled task to run auto-sync every Monday 06:00
 #
@@ -64,7 +64,7 @@ try {
         -Action $action `
         -Trigger $trigger `
         -Settings $settings `
-        -Description "Weekly auto-sync of bonin-skills from upstream repositories (baoyu-skills, ljg-skills)" `
+        -Description "Weekly auto-sync of bonin-skills from upstream repositories (baoyu-skills, ljg-skills, book-to-skill, handraw-style)" `
         -RunLevel Highest `
         -Force | Out-Null
 

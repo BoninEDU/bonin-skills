@@ -8,13 +8,15 @@ user_invocable: true
 
 把本地 `~/.claude/skills/bonin-*` 里改过的 skills，一键同步到 github repo，覆盖 master 和 md 两个分支。
 
-## 仓库路径（硬编码）
+## 仓库路径（可通过环境变量覆盖）
 
 ```
-SKILLS_REPO="$HOME/code/bonin-skills"     # 本地工作 repo
-SKILLS_LOCAL="$HOME/.claude/skills"      # 本地 skill 源
-REPO_URL="git@github.com:BoninEDU/bonin-skills.git"
+SKILLS_REPO="${BONIN_SKILLS_REPO:-$HOME/code/bonin-skills}"     # 本地工作 repo
+SKILLS_LOCAL="${BONIN_SKILLS_LOCAL:-$HOME/.claude/skills}"      # 本地 skill 源
+REPO_URL="${BONIN_REPO_URL:-git@github.com:BoninEDU/bonin-skills.git}"
 ```
+
+> **平台要求**：`scripts/push.sh` 是 bash 脚本，需要 macOS、Linux 或 Windows 下的 WSL/Git Bash。Windows 用户请通过 WSL 运行，并按需设置 `BONIN_SKILLS_REPO` 环境变量指向 WSL 内的仓库路径。
 
 如果 `$SKILLS_REPO` 不存在，脚本会自动 clone。如果它存在但不是 bonin-skills 的 git repo，脚本会报错退出（不破坏现有目录）。
 
@@ -29,7 +31,7 @@ REPO_URL="git@github.com:BoninEDU/bonin-skills.git"
 
 ## 工作流
 
-按 `Workflows/Push.md` 步骤执行 → 调用 `Tools/Push.sh`。
+按 `references/push.md` 步骤执行 → 调用 `scripts/push.sh`。
 
 ## README 一致性（硬 gate）
 
@@ -106,5 +108,5 @@ User: /bonin-push --dry-run
 - *untracked 杂物（如 `assets/measure.js`）会被 rsync 同步到 repo*——如果不想推，先在本地删掉，或加进 `.gitignore`
 - *org 文件本体已自动转换（2026-06-12 起）*——template.org 等会被转成 .md 并删除原件，每次推送重新生成（rsync --delete 冲掉也无妨，幂等）。遗留手工项只剩正文里的 `*bold*` 标记。新增带复杂构件的 org reference 文件后，先 `--dry-run` 或沙盒跑一遍 mdize 看转换效果
 - *脚本会自动 bump patch version 在 plugin.json + marketplace.json*——如果你想 bump minor / major，先手动改完再跑脚本，脚本只追加 patch
-- *如果 md 分支的远端比本地新（继刚另一台机器推过）*，脚本会 `pull --rebase` 失败时尝试一次 `reset --hard origin/md` 重新应用——这会丢弃本地未推的 md 分支 commit。脚本前会提示
-- *搬迁记录*：repo 历史曾在 `~/.claude.backup-20260502/bonin-skills-repo/`（路径名带 backup 是历史遗留），2026-05-02 搬到 `~/code/bonin-skills/`
+- *如果 md 分支的远端比本地新（Bonin 另一台机器推过）*，脚本会 `pull --rebase` 失败时尝试一次 `reset --hard origin/md` 重新应用——这会丢弃本地未推的 md 分支 commit。脚本前会提示
+- *搬迁记录*：repo 历史曾在 `~/.claude.backup-20260502/bonin-skills-repo/`（路径名带 backup 是历史遗留），2026-05-02 搬到 `$BONIN_SKILLS_REPO`（默认 `~/code/bonin-skills/`）

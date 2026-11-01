@@ -1,6 +1,8 @@
 # Bonin Skills 用户手册
 
-> 版本：1.113.0 | 仓库：[github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | 邮箱：boninedu2025@gmail.com
+> 版本：2.5.0 | 仓库：[github.com/BoninEDU/bonin-skills](https://github.com/BoninEDU/bonin-skills) | 官网：[boninaigc.top](https://www.boninaigc.top) | 邮箱：boninaigc@gmail.com
+
+> **Bonin AIGC** — *成就超级个体和团队*
 
 ---
 
@@ -29,6 +31,14 @@
 **Bonin Skills** 是一套为 Claude Code 打造的技能集合插件，涵盖内容生成、AI 图像生成、论文阅读、内容发布、写作工具、知识分析等多个领域。每个技能都是自包含的独立目录，可单独安装到 `~/.claude/skills/` 以扩展 Claude Code 的能力。
 
 本插件通过 Claude Code Marketplace 分发，也可手动安装使用。
+
+### 关于 Bonin AIGC
+
+**Bonin AIGC** 的使命是 **成就超级个体和团队**。本技能集是其在 AI 原生生产力生态中的开源贡献之一。
+
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- GitHub：[BoninEDU](https://github.com/BoninEDU)
 
 ---
 
@@ -303,6 +313,21 @@ AI 漫画生成器，支持多种艺术风格。将故事内容转化为漫画�
 
 ---
 
+#### bonin-handraw-style
+
+**版本**：1.9.8 | **触发词**：`hand-drawn style`、`手绘风格`、`风格编号`、`画风提示词`
+
+手绘风格提示词引擎：以 367 种编号画风（#001–#367）、36 组主题色（C-01–C-36）与 170 种排版图型为素材，把「风格编号 + 主题」组装成出版级中英双语生图提示词。默认只产出提示词、不直接生图；未指定风格/主题色时自动实时推荐最优组合。内含 15 个子技能（文章配图、封面设计、海报提示词、风格融合、IP 设计、拍摄企划、自建资产库、风格入库、推文画风抓取、版式录入、商业分析、作品分享等）与离线画廊，自带 `validate_library.py` 全量库校验。
+
+| 命令 | 说明 |
+|------|------|
+| `风格：FA-013，主题：秋分` | 输出该风格的完整双语提示词 |
+| `切换为图文模式` | 追加排版图型与主题色组装 |
+
+**依赖**：纯提示词使用无需任何外部依赖（离线画廊，无需 API Key）
+
+---
+
 ### 三、发布技能
 
 #### bonin-post-to-x
@@ -465,6 +490,20 @@ YouTube 视频字幕/文稿下载器。支持多语言、翻译、章节分割�
 | `--translate zh-Hans` | 翻译为指定语言 |
 | `--list` | 列出可用字幕 |
 | `--refresh` | 强制重新获取 |
+
+---
+
+#### bonin-book-to-skill
+
+**版本**：1.0.0（Bonin 首发版） | **触发词**：`book to skill`、`把书做成 Skill`、`书转技能`
+
+把任何技术书籍转化为可验证、可安装的 Claude Code / agent Skill：抽取章节、生成 `SKILL.md` 与参考文档，再以全量迁移的测试体系（56 个测试文件）验证后落盘。完整保留上游契约——翻译漂移校验（translation-meta 标记 + 锁定术语）与 README/docs 主机清单锁定行。
+
+| 命令 | 说明 |
+|------|------|
+| `python -m pytest tests/` | 在技能目录内运行完整测试套件 |
+
+**依赖**：Python 3 + pytest
 
 ---
 
@@ -754,4 +793,4 @@ cp -r skills/bonin-* ~/.claude/skills/
 
 ---
 
-> 📖 Bonin Skills v1.113.0 | © BoninEDU | [GitHub](https://github.com/BoninEDU/bonin-skills)
+> 📖 Bonin Skills v2.5.0 | © Bonin AIGC | [官网](https://www.boninaigc.top) | [GitHub](https://github.com/BoninEDU/bonin-skills) | boninaigc@gmail.com

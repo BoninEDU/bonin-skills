@@ -47,6 +47,107 @@ sources:
       # SSH URL 特殊处理（@ 字符用 \x40 转义）
       - { pattern: "git\\x40github\\.com:lijigang/ljg-skills\\.git", replace: "git@github.com:BoninEDU/bonin-skills.git" }
 
+  # ============================================================
+  # Added 2026-11: migrated sources (additive, backward compatible)
+  # ============================================================
+
+  - name: book-to-skill
+    # Migrated 2026-11-01 as skills/bonin-book-to-skill/ (full-stack)
+    path: "d:\\Repo\\book-to-skill"
+    # Initial baseline = upstream HEAD at migration time (2026-11-01).
+    # Live baseline is tracked in baselines.json (auto-advanced after commit).
+    baseline_commit: "7540eefbe74933f5fc84c86becac52486b347778"
+    # dest_prefix: upstream repo root maps under this prefix in bonin-skills
+    dest_prefix: "skills/bonin-book-to-skill"
+    # Inner package dir rename: book_to_skill/ -> bonin_book_to_skill/
+    path_replace:
+      - { from: "^book_to_skill/", to: "bonin_book_to_skill/", regex: true }
+    content_replacements:
+      # R1-R3: upstream GitHub URLs (longest first)
+      - { pattern: "github\\.com/virgiliojr94/book-to-skill", replace: "github.com/BoninEDU/bonin-skills" }
+      - { pattern: "virgiliojr94/book-to-skill", replace: "BoninEDU/bonin-skills" }
+      - { pattern: "github\\.com/virgiliojr94", replace: "github.com/BoninEDU" }
+      # R4: upstream author account
+      - { pattern: "virgiliojr94", replace: "BoninEDU" }
+      # R7: brand/title forms (case-sensitive, run BEFORE generic hyphen form).
+      # Lookbehind keeps re-runs idempotent (already-migrated text unchanged).
+      - { pattern: "(?<!Bonin )Book-to-Skill", replace: "Bonin Book-to-Skill", case_sensitive: true }
+      - { pattern: "(?<!BONIN-)BOOK-TO-SKILL", replace: "BONIN-BOOK-TO-SKILL", case_sensitive: true }
+      - { pattern: "Booklin", replace: "Bonin", case_sensitive: true }
+      - { pattern: "booklin", replace: "bonin", case_sensitive: true }
+      # R5: python package name (underscore form, lookbehind = idempotent)
+      - { pattern: "(?<!bonin_)book_to_skill", replace: "bonin_book_to_skill", case_sensitive: true }
+      # R6: CLI / skill name (hyphen form, lookbehind = idempotent)
+      - { pattern: "(?<!bonin-)book-to-skill", replace: "bonin-book-to-skill", case_sensitive: true }
+    # R8: email leftovers
+    contributor_patterns:
+      - { pattern: " <[^>]+@[^>]+>", replace: "" }
+    # Source-specific skip patterns = files excluded at migration time
+    skip_patterns:
+      - "^\\.github/"
+      - "^BACKERS\\.md$"
+      - "^CONTRIBUTING\\.md$"
+      - "^LICENSE\\.md$"
+      - "^SECURITY\\.md$"
+      - "^SECURITY-NOTICE\\.md$"
+      - "^README\\.md$"
+      - "^README\\.ru\\.md$"
+      - "^README\\.zh-CN\\.md$"
+      - "^CLAUDE\\.md$"
+      - "^mkdocs\\.yml$"
+      - "^cliff\\.toml$"
+      - "^overrides/"
+      - "^docs/index\\.md$"
+      - "^docs/404\\.md$"
+      - "^docs/CNAME$"
+      - "^docs/robots\\.txt$"
+      - "^docs/assets/"
+
+  - name: handraw-style
+    # Migrated 2026-11-01 as skills/bonin-handraw-style/ (full-stack)
+    path: "d:\\Repo\\handraw-style"
+    baseline_commit: "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d"
+    dest_prefix: "skills/bonin-handraw-style"
+    # NOTE: the inner sub-skill dir skills/handdraw-style-prompter/ KEEPS its
+    # name on purpose (install layout dependency) - do not add a generic
+    # handraw-style -> bonin-handraw-style replacement (the string
+    # "handraw-style" is a substring of the migrated brand name itself).
+    path_replace: []
+    content_replacements:
+      # H1/H2: upstream domains -> Bonin site (longest first)
+      - { pattern: "static\\.handraw-style\\.com", replace: "www.boninaigc.top" }
+      - { pattern: "img\\.handraw-style\\.com", replace: "www.boninaigc.top" }
+      - { pattern: "handraw-style\\.com", replace: "www.boninaigc.top" }
+      # H3: upstream GitHub URL
+      - { pattern: "github\\.com/yang0/handraw-style", replace: "github.com/BoninEDU/bonin-skills" }
+      # H7: gitee mirror (MUST run before H4, else the bare author-id rule
+      # rewrites the URL before these specific patterns can match)
+      - { pattern: "git@gitee\\.com:yang02010/handraw-style\\.git", replace: "git@github.com:BoninEDU/bonin-skills\\.git" }
+      - { pattern: "gitee\\.com:yang02010/handraw-style", replace: "github.com/BoninEDU/bonin-skills" }
+      - { pattern: "gitee\\.com/yang02010/handraw-style", replace: "github.com/BoninEDU/bonin-skills" }
+      # H4: upstream author identifiers (longest first)
+      - { pattern: "yang02010", replace: "Bonin" }
+      - { pattern: "yang0/handraw-style", replace: "BoninEDU/bonin-skills" }
+      - { pattern: "\\byang0\\b", replace: "Bonin" }
+      # H5: upstream studio brand
+      - { pattern: "HandRaw Style Studio", replace: "Bonin AIGC" }
+      # H6: third-party marketplace endpoint
+      - { pattern: "open\\.workbuddy\\.cn", replace: "www.boninaigc.top" }
+      # SKILL.md frontmatter name line ONLY (inner sub-skill paths unchanged)
+      - { pattern: "(?m)^name:\\s*handdraw-style-prompter\\s*$", replace: "name: bonin-handraw-style" }
+    skip_patterns:
+      - "^\\.github/"
+      - "^README\\.md$"
+      - "^README_en\\.md$"
+      - "^RELEASE_AUDIT\\.md$"
+      - "^build_workbuddy_release\\.py$"
+      - "^scripts/workbuddy_check_audit\\.py$"
+      - "^scripts/workbuddy_midnight_resubmit\\.py$"
+      - "^scripts/sync_to_static\\.py$"
+      - "^scripts/discourse_client\\.py$"
+      - "^scripts/audit_release\\.py$"
+      - "^scripts/package_skill\\.py$"
+
 # ============================================================
 # 目标仓库配置 / Target Repository
 # ============================================================
@@ -106,6 +207,13 @@ audit:
     - "lijigang"
     - "baoyu-skills"
     - "ljg-skills"
+    # Added 2026-11 (verified zero-match repo-wide at migration time)
+    - "virgiliojr94"
+    - "booklin"
+    - "yang02010"
+    - "handraw-style.com"
+    - "HandRaw Style Studio"
+    - "open.workbuddy.cn"
   # 检查 package.json 名称一致性
   check_package_names: true
   # 检查 bun.lock 文件

@@ -1,0 +1,14 @@
+{
+  "book-to-skill": {
+    "initial": "7540eefbe74933f5fc84c86becac52486b347778",
+    "previous": "7540eefbe74933f5fc84c86becac52486b347778",
+    "baseline": "7540eefbe74933f5fc84c86becac52486b347778",
+    "updated_at": "2026-11-01T00:00:00"
+  },
+  "handraw-style": {
+    "initial": "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d",
+    "previous": "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d",
+    "baseline": "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d",
+    "updated_at": "2026-11-01T00:00:00"
+  }
+}

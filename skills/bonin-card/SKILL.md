@@ -51,7 +51,7 @@ npm install playwright && npx playwright install chromium
 
 ### Footer
 
-- 左侧：logo + 李继刚（已硬编码在模板中）
+- 左侧：logo + Bonin AIGC（已硬编码在模板中）
 - 右侧：内容来源（可选）——有明确来源时显示（如作者名、arxiv ID、网站名等），无来源时留空。使用 `{{SOURCE_LINE}}` 变量：有来源时填 `<span class="info-source">来源文字</span>`，否则空字符串。适用于 `-l`、`-i`、`-v`、`-c`、`-w` 模具（`-m` 多卡无 footer，不适用）。
 
 ### 交付

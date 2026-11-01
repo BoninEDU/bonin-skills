@@ -14,7 +14,7 @@
 self_wxid: wxid_xxxxxxxxxxxx
 
 # REQUIRED — the display name to substitute for your wxid in digest text.
-self_display: 宝玉
+self_display: Bonin
 
 # OPTIONAL — which version(s) to generate when the user doesn't explicitly say.
 # Values: normal | roast | both

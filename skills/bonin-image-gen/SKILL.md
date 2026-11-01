@@ -13,6 +13,8 @@ metadata:
 
 # Image Generation (AI SDK)
 
+> **⚠️ Deprecated**: This skill is superseded by [`bonin-imagine`](../bonin-imagine), which supports the same providers plus additional features. Kept functional for backward compatibility — new integrations should use `bonin-imagine`.
+
 Official API-based image generation. Supports OpenAI GPT Image 2, Azure OpenAI, Google, OpenRouter, DashScope (阿里通义万象), Z.AI GLM-Image, MiniMax, Jimeng (即梦), Seedream (豆包), Replicate and Agnes.
 
 ## User Input Tools

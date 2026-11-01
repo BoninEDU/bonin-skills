@@ -2,17 +2,15 @@
 
 [English](./README.md) | 中文
 
-宝玉分享的 AI Agent 技能集（适用于 Claude Code、Codex 等），提升日常工作效率。
+Bonin AIGC 分享的 AI Agent 技能集（适用于 Claude Code、Codex 等），提升日常工作效率。
 
-## 作者的图书
+## Bonin AIGC
 
-<img width="500" height="500" alt="图解 Skill —— AI 提效实战指南" src="https://github.com/user-attachments/assets/6caef6a2-6f11-490e-a43b-e810df8e9354" />
+> **成就超级个体和团队** — Empower Super-Individuals and Super-Teams
 
-作者的图书《图解 Skill —— AI 提效实战指南》系统讲解如何设计、编写、安装和迭代 Skill，并配有完整示例、提示词、插图生成工作流和章节配套资源。
-
-- 官方配套仓库：[BoninEDU/Illustrated-Agent-Skills](https://github.com/BoninEDU/Illustrated-Agent-Skills)
-- 购买链接：[京东购买](https://u.jd.com/RDY9YwC)
-- 电子书购买链接：https://www.ituring.com.cn/book/3616
+- 官方网站：[https://www.boninaigc.top](https://www.boninaigc.top)
+- 邮箱：boninaigc@gmail.com
+- 配套仓库：[BoninEDU/Illustrated-Agent-Skills](https://github.com/BoninEDU/Illustrated-Agent-Skills)
 
 ## 前置要求
 
@@ -698,11 +696,11 @@ default_color: blue
 
 # 账号列表
 accounts:
-  - name: 宝玉的技术分享
+  - name: Bonin的技术分享
     alias: bonin
     default: false
     default_publish_method: api
-    default_author: 宝玉
+    default_author: Bonin
     need_open_comment: 1
     only_fans_can_comment: 0
     app_id: 你的微信 AppID
@@ -930,6 +928,18 @@ AI 驱动的生成后端。
 /bonin-danger-gemini-web --prompt "一只可爱的猫" --image cat.png
 /bonin-danger-gemini-web --promptfiles system.md content.md --image out.png
 ```
+
+#### bonin-handraw-style
+
+手绘风格提示词引擎：367 种编号手绘风格（#001–#367）、36 组主题色（C-01–C-36）与 170 种排版图型（社媒卡 / 数据信息图 / 漫画分镜 / IP 设计 / 电商图型），把「风格编号 + 主题」组装成出版级中英双语生图提示词。默认只产出提示词、不直接生图；未指定风格/主题色时自动实时推荐最优组合。内含 15 个子技能（文章配图规划、封面设计、海报提示词、风格融合、IP 设计、拍摄企划、自建资产库、风格入库、推文画风抓取、版式录入、商业分析、作品分享等）与离线画廊，自带 `validate_library.py` 全量库校验。
+
+```bash
+# 常用指令形态（自然语言即可）
+风格：FA-013，主题：秋分
+切换为图文模式
+```
+
+安装后由技能根 `SKILL.md` 作为唯一入口自动路由；详见 [skills/bonin-handraw-style/README.md](skills/bonin-handraw-style/README.md)。
 
 ### 工具技能 (Utility Skills)
 
@@ -1231,6 +1241,17 @@ AI 驱动的生成后端。
 | `--json` | 在 stdout 输出一行 JSON 概要 | false |
 
 **输出结构**：`extract-report.json`（计数、警告、路径），`extracted/`（asar 原始内容，无 map 时原地美化），`extracted.unpacked/`（存在时复制的原生模块），以及 `restored/`（基于 `.js.map` 重建的源码树）。
+
+#### bonin-book-to-skill
+
+把任何技术书籍转化为可验证、可安装的 Claude Code / agent Skill：抽取章节、生成 `SKILL.md` 与参考文档，再跑通完整测试体系后落盘。完整保留上游契约——翻译漂移校验（translation-meta + 锁定术语）与 README/docs 主机清单锁定行；56 个测试文件随技能全量迁移。
+
+```bash
+# 在技能目录内运行完整测试
+python -m pytest tests/
+```
+
+详见 [skills/bonin-book-to-skill/README.md](skills/bonin-book-to-skill/README.md) 与其 `docs/`。
 
 ## 环境配置
 

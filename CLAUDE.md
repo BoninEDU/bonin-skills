@@ -1,6 +1,9 @@
 # CLAUDE.md
 
-Claude Code marketplace plugin providing AI-powered content generation skills. Version: **2.0.0**.
+Claude Code marketplace plugin providing AI-powered content generation skills. Version: **2.5.0**.
+
+> **Bonin AIGC** — *Empower Super-Individuals and Super-Teams*
+> Website: [boninaigc.top](https://www.boninaigc.top) | Email: boninaigc@gmail.com | GitHub: [BoninEDU](https://github.com/BoninEDU)
 
 ## Architecture
 
@@ -30,7 +33,7 @@ Execute: `${BUN_X} skills/<skill>/scripts/main.ts [options]`
 ## Key Dependencies
 
 - **Bun**: TypeScript runtime (`bun` preferred, fallback `npx -y bun`)
-- **Chrome**: Required for CDP-based skills (gemini-web, post-to-x/wechat/weibo, url-to-markdown). All CDP skills share a single profile, override via `BONIN_CHROME_PROFILE_DIR` env var. Platform paths: [docs/chrome-profile.md](docs/chrome-profile.md)
+- **Chrome**: Required for CDP-based skills (gemini-web, post-to-x/wechat/weibo, url-to-markdown). All CDP skills share a single profile, override via `BONIN_CHROME_PROFILE_DIR` env var. Platform paths: macOS `~/Library/Application Support/Google/Chrome/Default`, Windows `%LOCALAPPDATA%\Google\Chrome\User Data\Default`, Linux `~/.config/google-chrome/default`.
 - **Image generation APIs**: `bonin-image-gen` requires API key (OpenAI, Azure OpenAI, Google, OpenRouter, DashScope, or Replicate) configured in EXTEND.md
 - **Gemini Web auth**: Browser cookies (first run opens Chrome for login, `--login` to refresh)
 
@@ -56,15 +59,15 @@ Each skill under `skills/` (and `.claude/skills/`) is distributed and consumed i
 
 - **Never link from `SKILL.md` or its `references/` to files outside the skill's own directory.** This includes `docs/`, sibling skills, and the repo root. Relative paths like `../../docs/foo.md` break when the skill is used standalone.
 - **Inline any shared convention** (e.g., user-input rules, image-generation backend selection) directly in the skill rather than referencing an out-of-skill doc.
-- Shared docs under `docs/` exist for **repo-author guidance only** — they may be referenced from `CLAUDE.md` and `docs/creating-skills.md`, but NOT from any `SKILL.md`. This applies to `docs/user-input-tools.md`, `docs/image-generation-tools.md`, `docs/image-generation.md`, and any other `docs/` file.
+- Shared conventions exist for **repo-author guidance only** — they may be referenced from `CLAUDE.md`, but NOT from any `SKILL.md`. Inline the convention directly into each skill that needs it.
 
 ## User Input Tools
 
-Skills that prompt users for choices MUST declare the tool-selection convention **inline** in exactly one place per `SKILL.md` — a `## User Input Tools` section near the top. Do NOT link out to [docs/user-input-tools.md](docs/user-input-tools.md); that doc is the author-side canonical source — copy its body into each SKILL.md. Concrete `AskUserQuestion` mentions elsewhere in a skill are treated as examples — other runtimes substitute their local equivalent under the rule.
+Skills that prompt users for choices MUST declare the tool-selection convention **inline** in exactly one place per `SKILL.md` — a `## User Input Tools` section near the top. Do NOT link out to any external doc; inline the canonical source into each SKILL.md. Concrete `AskUserQuestion` mentions elsewhere in a skill are treated as examples — other runtimes substitute their local equivalent under the rule.
 
 ## Image Generation Tools
 
-Skills that render images MUST declare the backend-selection convention **inline** in exactly one place per `SKILL.md` — a `## Image Generation Tools` section near the top (after `## User Input Tools`). Do NOT link out to [docs/image-generation-tools.md](docs/image-generation-tools.md); that doc is the author-side canonical source — copy its body into each SKILL.md. Concrete tool names (`imagegen`, `GenerateImage`, `image_generate`, `bonin-image-gen`) elsewhere in a skill are treated as examples — other runtimes substitute their local equivalent under the rule. The rule is stateless: use whatever backend is available; if multiple, ask the user once; if none, ask how to proceed. Every rendered image's full prompt must be written to a standalone `prompts/NN-*.md` file before any backend is invoked. Backend skills (`bonin-image-gen`, `bonin-danger-gemini-web`) are exempt — they render directly rather than selecting a backend.
+Skills that render images MUST declare the backend-selection convention **inline** in exactly one place per `SKILL.md` — a `## Image Generation Tools` section near the top (after `## User Input Tools`). Do NOT link out to any external doc; inline the canonical source into each SKILL.md. Concrete tool names (`imagegen`, `GenerateImage`, `image_generate`, `bonin-image-gen`) elsewhere in a skill are treated as examples — other runtimes substitute their local equivalent under the rule. The rule is stateless: use whatever backend is available; if multiple, ask the user once; if none, ask how to proceed. Every rendered image's full prompt must be written to a standalone `prompts/NN-*.md` file before any backend is invoked. Backend skills (`bonin-image-gen`, `bonin-danger-gemini-web`) are exempt — they render directly rather than selecting a backend.
 
 ### `codex-imagegen` Backend
 
@@ -82,7 +85,7 @@ bun packages/bonin-codex-imagegen/src/main.ts \
 
 Without bun installed: `npx -y bun packages/bonin-codex-imagegen/src/main.ts …`.
 
-Stdout emits a single JSON line: `{"status":"ok","path":...,"bytes":N,...}`. On failure, `{"status":"error","error_kind":...}`. Skills route here by setting `preferred_image_backend: codex-imagegen` in EXTEND.md, or by running `bonin-image-gen --provider codex-cli` (which spawns the same wrapper internally). Full reference: [docs/codex-imagegen-backend.md](docs/codex-imagegen-backend.md).
+Stdout emits a single JSON line: `{"status":"ok","path":...,"bytes":N,...}`. On failure, `{"status":"error","error_kind":...}`. Skills route here by setting `preferred_image_backend: codex-imagegen` in EXTEND.md, or by running `bonin-image-gen --provider codex-cli` (which spawns the same wrapper internally).
 
 ## Release Process
 
@@ -98,15 +101,21 @@ TypeScript, no comments, async/await, short variable names, type-safe interfaces
 
 ## Adding New Skills
 
-All skills MUST use `bonin-` prefix. Details: [docs/creating-skills.md](docs/creating-skills.md)
+All skills MUST use `bonin-` prefix. Use existing skills (e.g., `bonin-card`, `bonin-paper`) as templates.
 
 ## Reference Docs
 
-| Topic | File |
-|-------|------|
-| Image generation output guidelines | [docs/image-generation.md](docs/image-generation.md) |
-| Image generation backend selection | [docs/image-generation-tools.md](docs/image-generation-tools.md) |
-| User input tool convention | [docs/user-input-tools.md](docs/user-input-tools.md) |
-| Chrome profile platform paths | [docs/chrome-profile.md](docs/chrome-profile.md) |
-| Comic style maintenance | [docs/comic-style-maintenance.md](docs/comic-style-maintenance.md) |
-| ClawHub/OpenClaw publishing | [docs/publishing.md](docs/publishing.md) |
+Authoring conventions (User Input Tools, Image Generation Tools, Chrome profile paths, comic style maintenance, publishing) are inlined directly into the relevant `SKILL.md` files and into the sections above. No separate `docs/` directory is maintained; each skill is self-contained.
+
+## Auto-Sync System
+
+This repo is kept in sync with upstream skill repositories by an automated system under [.auto-sync/](.auto-sync/README.md). The system:
+
+1. **Monitors upstream** skill repos weekly (Windows Task Scheduler, every Monday 06:00)
+2. **Sanitizes content** — strips original author names (English & Chinese), repo URLs, emails, and replaces paths (`baoyu` → `bonin`, `ljg` → `bonin`)
+3. **Audits** — checks `SKILL.md` front matter, package names, lock files, and forbidden keywords (`JimLiu`, `lijigang`, `baoyu-skills`, `ljg-skills`, `继刚`, `李继刚`, `宝玉`)
+4. **Auto-pushes** to GitHub after audit passes
+
+Run manually: `powershell -ExecutionPolicy Bypass -File .auto-sync/auto-sync.ps1` (use `-DryRun` for preview, `-Force` to ignore baseline).
+
+Full documentation: [.auto-sync/README.md](.auto-sync/README.md)

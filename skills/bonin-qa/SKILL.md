@@ -31,11 +31,11 @@ user_invocable: true
 
 ## 工作流
 
-按 `Workflows/Extract.md` 的步骤执行。
+按 `references/extract.md` 的步骤执行。
 
 ## 设计参考
 
-Q 怎么提、A 怎么收口的具体模式见 `References/QuestionDesign.md`。
+Q 怎么提、A 怎么收口的具体模式见 `references/question-design.md`。
 
 ## Voice Notification
 

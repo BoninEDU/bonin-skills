@@ -1,4 +1,4 @@
----
+﻿---
 name: bonin-paper
 description: "Paper reader for non-academics. Reads a paper and tells it back as one continuous story — the life of the paper's core proposition (命题), told on a seven-beat spine (主角 / 困境 / 旧路 / 转折 / 解法 / 结局 / 内核): born in a bind on a base-rate ruler, crystallized as a bold conjecture, argued through mechanism and evidence, distilled into a new way of seeing, then walked out of the paper — life-tested and cashed into falsifiable predictions (检验). Output opens with a scannable 速读 card (一句话 / 大想法 / 只记三件事) that compresses the whole story three ways for the time-poor reader and the six-months-later self, then tells the full story. The job is storytelling that makes the paper land, not academic critique. Use when user shares an arxiv link, paper URL, PDF, or asks to analyze a research paper. Trigger words: '读论文', '讲论文', '把这篇讲给我听', '分析论文', 'paper', or when user shares an academic paper."
 user_invocable: true
