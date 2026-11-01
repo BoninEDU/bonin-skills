@@ -26,8 +26,8 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-HANDRAW_STYLE_DIR = Path(r"E:\handraw-style")
-X_EXPERT_DIR = Path(r"G:\x-expert")
+HANDRAW_STYLE_DIR = Path(__file__).resolve().parents[3]
+X_EXPERT_DIR = Path(os.environ.get("BONIN_HANDRAW_OUTPUT_DIR", str(HANDRAW_STYLE_DIR / "images")))
 SKILL_DIR = HANDRAW_STYLE_DIR / "skills" / "handdraw-style-prompter"
 SKILL_SCRIPTS_DIR = SKILL_DIR / "scripts"
 STYLES_JSON_PATH = SKILL_DIR / "references" / "styles.json"
@@ -49,7 +49,7 @@ except ImportError as e:
     raise ImportError(f"加载手绘 Skill 脚本失败: {e} (路径: {SKILL_SCRIPTS_DIR})")
 
 # 引入项目生图客户端
-RELEASE_SCRIPTS_DIR = Path(r"E:\projectHome\handraw-fabu\style\scripts")
+RELEASE_SCRIPTS_DIR = Path(os.environ.get("BONIN_HANDRAW_IMAGE_CLIENT_DIR", str(HANDRAW_STYLE_DIR / "scripts")))
 if str(RELEASE_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(RELEASE_SCRIPTS_DIR))
 
@@ -729,7 +729,7 @@ def main():
     g_target.add_argument("--style", help="指定画风编号 (如 FG-024 / 367)")
     g_target.add_argument("--layout", help="指定图型编号 (如 SC-021 / IG-036)")
 
-    parser.add_argument("-t", "--article-title", help="文章标题 (用于定位输出目录 G:\\x-expert\\now\\images\\<title>)")
+    parser.add_argument("-t", "--article-title", help="文章标题 (用于定位输出目录，默认 <包根>/images/now/images/<title>，可用环境变量 BONIN_HANDRAW_OUTPUT_DIR 覆盖)")
     parser.add_argument("-o", "--output-dir", help="显式指定输出目录")
     parser.add_argument("--count", type=int, default=5, choices=[4, 5], help="生成案例数 (4 或 5 张，默认 5)")
     parser.add_argument("--size", help="显式覆盖画幅规格 (默认智能推导 1792x1024 或 1086x1448)")
