@@ -148,6 +148,38 @@ sources:
       - "^scripts/audit_release\\.py$"
       - "^scripts/package_skill\\.py$"
 
+  - name: stickman-video-director
+    # Migrated 2026-11-10 as skills/bonin-stickman-video-director/ (full-stack)
+    # NOTE: declarative registration only. auto-sync.ps1 keeps its source list
+    # hardcoded; wiring this source into the weekly runner needs a code change
+    # and is intentionally left for human approval.
+    path: "d:\\Repo\\stickman-video-director"
+    baseline_commit: "2f018c9112a87874ea83f88549ad93837b30b8df"
+    dest_prefix: "skills/bonin-stickman-video-director"
+    # Inner package dir skills/directing-stickman-videos/ KEEPS its name on
+    # purpose (install layout + upstream regression tests depend on it).
+    path_replace: []
+    content_replacements:
+      # Strip upstream promotion tracking params only; attribution URLs and
+      # copyright notices are kept verbatim (MIT / third-party asset licenses).
+      - { pattern: "\\?utm_source=crazykaomei-aini-202610&utm_medium=xcom", replace: "" }
+    skip_patterns:
+      - "^\\.github/"
+      # Marketing preview media and sponsor banners (excluded: size + ads rule)
+      - "^assets/readme/"
+      - "^assets/sponsors/"
+      - "^scripts/optimize-readme-previews\\.sh$"
+      # Marketing READMEs in 9 languages (Bonin README.md replaces them)
+      - "^README(\\.[a-zA-Z-]+)?\\.md$"
+      # Upstream-only QA harness: README/marketing/git-history/single-skill invariants
+      - "^tests/reports/"
+      - "^tests/verify-chinese-onboarding\\.py$"
+      - "^tests/verify-localized-readmes\\.py$"
+      - "^tests/verify-thumbnail-kit\\.py$"
+      - "^tests/verify-voice-continuity\\.py$"
+      - "^tests/verify-first-use-guidance\\.py$"
+      - "^tests/verify-readmes\\.sh$"
+
 # ============================================================
 # 目标仓库配置 / Target Repository
 # ============================================================

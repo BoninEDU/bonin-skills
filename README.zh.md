@@ -941,6 +941,18 @@ AI 驱动的生成后端。
 
 安装后由技能根 `SKILL.md` 作为唯一入口自动路由；详见 [skills/bonin-handraw-style/README.md](skills/bonin-handraw-style/README.md)。
 
+#### bonin-stickman-video-director
+
+火柴人视频导演：把选题、需求、文章或脚本做成火柴人视频。A · 导演模式（A1–A5 + A6 Amber Noir）产出已确认分镜与独立视频提示词；B · 全自动模式（B1–B5：极简手绘 / 彩色手绘 / 复古电视 / 求生短剧 / 角色解说）在本地完成旁白、语义字幕、插画、微动效、音效与合成。运行 B 模式需 Node 20+ 与 FFmpeg/FFprobe，A6 脚本需 Python 3；生成服务用你自己的配置，密钥只走环境变量。
+
+```bash
+# 自然语言即可
+用 B1 画风做一条 60 秒、9:16 的火柴人视频，主题：为什么越努力越焦虑
+把这篇文章改成分镜，Style 4，90 秒，16:9
+```
+
+安装技能后，先在包内执行 `npm ci` 与 `node scripts/autopilot.mjs doctor`；详见 [skills/bonin-stickman-video-director/README.md](skills/bonin-stickman-video-director/README.md)。移植自上游开源项目 [stickman-video-director](https://github.com/kaomei/stickman-video-director)（MIT，许可证原样保留）。
+
 ### 工具技能 (Utility Skills)
 
 内容处理工具。

@@ -90,6 +90,7 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-wechat-summary** | 群聊精华 — 把微信群聊记录提炼成结构化简报（正常版 / 毒舌版），维护跨次运行的群聊历史、群友画像与事实记忆 |
 | **bonin-book-to-skill** | 书→技能 — 把任何技术书籍转化为可验证、可安装的 Claude Code / agent Skill（保留翻译漂移契约与主机清单锁定行，56 个测试文件全量迁移） |
 | **bonin-handraw-style** | 手绘风格提示词引擎 — 367 种编号画风（#001–#367）× 36 组主题色（C-01–C-36）× 170 种排版图型，双语提示词组装，15 个子技能 + 离线画廊 + 自校验库契约 |
+| **bonin-stickman-video-director** | 火柴人视频导演 — 选题/文章/脚本 → 火柴人视频：A 导演模式出分镜与提示词（A1–A5、A6 Amber Noir），B 全自动模式本地渲染成片（B1–B5，旁白+语义字幕+插画+微动效+音效） |
 
 
 ## 工作流
