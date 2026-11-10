@@ -81,11 +81,11 @@ npm run doctor
 |------|------|
 | 依赖安装 `npm ci` | 成功（10 packages） |
 | 自检 `npm run doctor` | `node/ffmpeg/ffprobe/canvas/sharp/fonts` 全部 `true`；`gemini_key_present: false`（未配置，属预期） |
-| Node 单元测试 `node --test tests/*.test.mjs` | 120 项：84 通过 / 36 失败；在**上游源仓库同机对照**同样为 84/36，失败成因是 Windows 符号链接权限与上游既有断言，非移植引入 |
-| Python 单测 `python -m unittest discover -s tests -p 'test_a6_references.py'` | 20 项：19 通过 / 1 错误（`WinError 1314` 创建符号链接需要特权） |
-| 仓库级校验 `tests/verify-*.py` | `verify-a6-guidance`、`verify-b-common-quality`、`verify-b1-baseline`、`verify-b1-production-standard`、`verify-cozy-storytelling`（已去除营销 GIF 断言）通过；`verify-a6-finishing`（写死 macOS 系统字体路径）、`verify-ab-preservation`（上游脚本自身 IndexError）、`verify-historical-cartoon`（上游指纹过期）在上游源仓库同样失败，属上游既有问题 |
+| Node 单元测试 `node --test tests/*.test.mjs` | 120 项：**120 通过 / 0 失败**（2026-11-10 修复后。最初 84/36，成因有二：① 仓库 `core.autocrlf=true` 把指纹锁定的 LF 文本转成 CRLF，导致 33 项指纹/跨行断言失败——已通过本目录 `.gitattributes`（`* -text`）修复；② 符号链接 EPERM 3 项——已开启 Windows 开发者模式修复） |
+| Python 单测 `python -m unittest discover -s tests -p 'test_a6_references.py'` | 20 项：**20 通过 / 0 失败**（同上，开发者模式开启后符号链接用例通过） |
+| 仓库级校验 `tests/verify-*.py` | `verify-a6-guidance`、`verify-ab-preservation`、`verify-b-common-quality`、`verify-b1-baseline`、`verify-b1-production-standard`、`verify-cozy-storytelling`、`verify-historical-cartoon` 通过（`ab-preservation` 与 `historical-cartoon` 的失败同为 CRLF 指纹问题，已随 `.gitattributes` 修复）；`verify-a6-finishing` 仍失败：上游写死 macOS 系统字体路径 `/System/Library/Fonts/Supplemental/Impact.ttf`，Windows/Linux 均无法通过，属上游平台限制 |
 
-未验证项：真实付费生成链路（图片/语音/视频服务）、Windows 符号链接相关用例、B4/B5 整片渲染的完整端到端流程（需要真实素材与授权调用）。上述状态如实标注，不代表“已调试可用”。
+未验证项：真实付费生成链路（图片/语音/视频服务）、B4/B5 整片渲染的完整端到端流程（需要真实素材与授权调用）。上述状态如实标注，不代表“已调试可用”。
 
 ## 与上游的差异
 
@@ -94,6 +94,7 @@ npm run doctor
 3. 移除 Renoise MCP 链接中的推广追踪参数（`utm_source` / `utm_medium`），保留基础安装地址。
 4. 未移植依赖上游 README / 营销媒体 / git 历史的 6 个校验脚本（`verify-chinese-onboarding`、`verify-localized-readmes`、`verify-thumbnail-kit`、`verify-voice-continuity`、`verify-first-use-guidance`、`verify-readmes.sh`）与 `tests/reports/`（上游历史审计快照）；`verify-cozy-storytelling.py` 删除营销 GIF 断言，保留全部规划逻辑校验。
 5. `LICENSE`、B1 素材授权说明、B5 素材致谢、字体 OFL 与 Lucide 许可证原样保留：MIT 与第三方资产许可要求保留版权声明。
+6. 新增 `.gitattributes`（`* -text`）：上游 manifest 的 SHA-256 指纹按 LF 字节计算，且部分测试按字面 `\n` 做跨行匹配；禁用本目录内所有行尾转换，保证检出文件与上游 Linux CI 字节一致。
 
 ## 许可与署名
 

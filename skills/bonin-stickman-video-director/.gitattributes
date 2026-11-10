@@ -1,0 +1,5 @@
+# Fingerprint-locked port: upstream manifests pin SHA-256 hashes computed over
+# LF line endings, and instruction-contract tests split on literal "\n".
+# Disable ALL line-ending conversion inside this skill so checkouts are
+# byte-for-byte identical to the upstream Linux CI baseline.
+* -text
