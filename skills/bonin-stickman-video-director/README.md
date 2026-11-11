@@ -59,10 +59,37 @@ npm run doctor
 ```
 
 - Node.js ≥ 20
-- FFmpeg / FFprobe（可用 `FFMPEG`、`FFPROBE` 环境变量指定路径）
+- FFmpeg / FFprobe（不配也能从 PATH 查找；可通过 `FFMPEG` / `FFPROBE` 环境变量指定完整路径）
 - Python 3（仅 A6 的 `a6_reference_check.py`、`a6_finish.py` 需要）
-- 字体：内置 `assets/fonts/` 覆盖拉丁字符；中日韩等语言请用 `AUTOPILOT_FONT` 指定字体
-- 生成服务：图片/语音使用你自己的已配置服务或适配器；内置 Gemini 适配器读取环境变量 `GEMINI_API_KEY`（不要粘贴到对话中）。订阅不等于 API 配额，付费调用前必须先报价并取得授权。
+- 字体：内置 `assets/fonts/` 覆盖拉丁字符；中日韩等语言请用 `AUTOPILOT_FONT` 指定系统字体
+- 生成服务：内置 Gemini 适配器读取 `GEMINI_API_KEY`（不要粘贴到对话）。其他服务如需接入，在 `scripts/gemini-media.mjs` 旁新增同名适配器即可（接口契约：`--allow-network --model --output --text/--prompt [--reference]`，输出 native 媒体 + `.request.json` 收据）。付费调用前必须先报价并取得授权。
+
+### 环境变量速查
+
+完整示例见 [.env.example](.env.example)；`.env` 已被 `.gitignore` 忽略，密钥放本地。
+
+| 变量 | 必填 | 说明 |
+|------|:----:|------|
+| `GEMINI_API_KEY` | 仅 B 模式/A6 | Gemini API Key；director 模式（A1–A5）不需要任何 Key |
+| `FFMPEG` / `FFPROBE` | 否 | ffmpeg/ffprobe 完整路径；不配用 PATH 查找 |
+| `AUTOPILOT_FONT` | 否 | 自定义字体路径；不配用包内 Caveat.ttf（拉丁字符覆盖） |
+| `XDG_CACHE_HOME` | 否 | Python Whisper 缓存目录覆盖 |
+
+PowerShell 示例（当前会话生效）：
+
+```powershell
+$env:GEMINI_API_KEY="AIzaSy..."
+$env:FFMPEG="C:\ffmpeg\bin\ffmpeg.exe"
+npm run doctor
+```
+
+bash 示例：
+
+```bash
+export GEMINI_API_KEY="AIzaSy..."
+export FFMPEG="/usr/local/bin/ffmpeg"
+npm run doctor
+```
 
 ## 使用
 

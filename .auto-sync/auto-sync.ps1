@@ -15,6 +15,11 @@
 #                    (auto-advanced after a successful commit).
 #                    Rollback support: see rollback.ps1 (revert sync commits /
 #                    restore skill dirs / rewind baselines).
+# 2026-11-10 extension: also syncs stickman-video-director ->
+#                    skills/bonin-stickman-video-director/ (attribution-
+#                    preserving: UTM strip + CRLF->LF normalize only; LICENSE /
+#                    package-lock.json / .gitignore kept via keep-override;
+#                    binary media ext added to $binaryExts).
 #
 # 用法：
 #   powershell -ExecutionPolicy Bypass -File auto-sync.ps1
@@ -47,15 +52,19 @@ $ljgBaseline = "0b77aa2"
 # ------------------------------------------------------------
 $bookRoot = "d:\Repo\book-to-skill"
 $handrawRoot = "d:\Repo\handraw-style"
+$stickmanRoot = "d:\Repo\stickman-video-director"
 
 # Initial baselines = upstream HEAD at migration time (2026-11-01).
 # Live baselines are read from baselines.json at runtime (auto-advanced).
 $bookInitialBaseline = "7540eefbe74933f5fc84c86becac52486b347778"
 $handrawInitialBaseline = "572dff8f8cc1dc16ff9bef1422e90b3dfc42284d"
+# stickman-video-director migrated 2026-11-10 (upstream HEAD at migration).
+$stickmanInitialBaseline = "2f018c9112a87874ea83f88549ad93837b30b8df"
 
 # dest_prefix: upstream repo root maps under this prefix inside bonin-skills
 $bookDestPrefix = "skills/bonin-book-to-skill"
 $handrawDestPrefix = "skills/bonin-handraw-style"
+$stickmanDestPrefix = "skills/bonin-stickman-video-director"
 
 # Source-specific skip patterns = files excluded at migration time
 # (upstream-only promo / packaging / repo metadata, never synced)
@@ -93,8 +102,33 @@ $handrawSkipPatterns = @(
     "^scripts/package_skill\.py$"
 )
 
-$binaryExts = @(".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".lock", ".lockb", ".pdf", ".zip", ".woff", ".woff2", ".ttf", ".eot")
+$binaryExts = @(".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".lock", ".lockb", ".pdf", ".zip", ".woff", ".woff2", ".ttf", ".eot", ".mp3", ".wav", ".mp4", ".m4a", ".ogg", ".flac")
 $skipPatterns = @("^LICENSE$", "^\.gitignore$", "^package-lock\.json$", "^bun\.lockb$", "^\.releaserc\.yml$")
+
+# stickman-video-director (added 2026-11-10)
+# Source-specific skip patterns = files excluded at migration time
+# (marketing preview media / sponsor banners / localized READMEs /
+#  upstream-only QA harness depending on them or on git history).
+$stickmanSkipPatterns = @(
+    "^\.github/",
+    "^assets/readme/",
+    "^assets/sponsors/",
+    "^scripts/optimize-readme-previews\.sh$",
+    "^README(\.[a-zA-Z-]+)?\.md$",
+    "^tests/reports/",
+    "^tests/verify-chinese-onboarding\.py$",
+    "^tests/verify-localized-readmes\.py$",
+    "^tests/verify-thumbnail-kit\.py$",
+    "^tests/verify-voice-continuity\.py$",
+    "^tests/verify-first-use-guidance\.py$",
+    "^tests/verify-readmes\.sh$"
+)
+# Keep-override for the global $skipPatterns: this source must sync
+# LICENSE (MIT attribution preserved by design), package-lock.json
+# (fingerprint / npm-ci stability) and .gitignore (node_modules/.env
+# exclusions inside the skill dir) even though the global list drops
+# them for legacy sources.
+$stickmanKeepPatterns = @("^LICENSE$", "^\.gitignore$", "^package-lock\.json$")
 
 # ============================================================
 # 工具函数
@@ -276,6 +310,18 @@ function Transform-Content {
         # name on purpose (install layout dependency) and must NOT be rewritten.
         $Content = $Content -replace '(?m)^name:\s*handdraw-style-prompter\s*$', 'name: bonin-handraw-style'
     }
+    elseif ($Source -eq "stickman") {
+        # Attribution-preserving port: ONLY strip promotion tracking params
+        # from the Renoise MCP setup link; upstream URLs, copyright notices
+        # and asset attributions are kept verbatim (MIT + third-party
+        # licenses require it). Idempotent: the bare URL won't re-match.
+        $Content = $Content -replace '\?utm_source=crazykaomei-aini-202610&utm_medium=xcom', ''
+        # The local upstream clone has core.autocrlf=true (CRLF worktree),
+        # but fingerprint manifests pin SHA-256 over LF bytes and contract
+        # tests split on literal "\n". Normalize so synced text stays
+        # byte-identical to the upstream Linux CI baseline.
+        $Content = $Content -replace "`r`n", "`n"
+    }
 
     return $Content
 }
@@ -296,6 +342,12 @@ function Map-Path {
         # no inner rewrite; dest prefix is applied by Sync-File
         return $RelativePath
     }
+    elseif ($Source -eq "stickman") {
+        # no inner rewrite; the inner package dir
+        # skills/directing-stickman-videos/ keeps its name on purpose
+        # (install layout + upstream regression tests depend on it).
+        return $RelativePath
+    }
     return $RelativePath
 }
 
@@ -310,7 +362,11 @@ function Sync-File {
         [string]$Source,
         # 2026-11 additions (backward compatible: empty defaults = legacy behavior)
         [string]$DestPrefix = "",
-        [string[]]$SourceSkipPatterns = @()
+        [string[]]$SourceSkipPatterns = @(),
+        # 2026-11-10 addition: keep-override for the global $skipPatterns
+        # (a matching path bypasses the global skip list but still honors
+        # $SourceSkipPatterns). Empty default = legacy behavior.
+        [string[]]$SourceKeepPatterns = @()
     )
 
     $srcFile = Join-Path $SrcRoot $RelPath
@@ -325,10 +381,20 @@ function Sync-File {
         return $false
     }
 
-    foreach ($pattern in $skipPatterns) {
+    $keepOverride = $false
+    foreach ($pattern in $SourceKeepPatterns) {
         if ($RelPath -match $pattern) {
-            Write-Log "  SKIP (pattern): $RelPath"
-            return $false
+            $keepOverride = $true
+            break
+        }
+    }
+
+    if (-not $keepOverride) {
+        foreach ($pattern in $skipPatterns) {
+            if ($RelPath -match $pattern) {
+                Write-Log "  SKIP (pattern): $RelPath"
+                return $false
+            }
         }
     }
 
@@ -459,6 +525,7 @@ $hasChanges = $false
 $syncedSources = @()
 $bookNewHead = $null
 $handrawNewHead = $null
+$stickmanNewHead = $null
 
 # 处理 baoyu-skills
 Write-Log ""
@@ -600,6 +667,42 @@ else {
     Write-Log "Source repo not found: $handrawRoot" -Level "WARN"
 }
 
+# Process stickman-video-director (added 2026-11-10)
+Write-Log ""
+Write-Log "=== SOURCE: stickman-video-director ==="
+if (Test-Path $stickmanRoot) {
+    $stickmanBaseline = Get-Source-Baseline -Name "stickman-video-director" -Initial $stickmanInitialBaseline
+    $currentHead = Get-Repo-Head -RepoPath $stickmanRoot
+    Write-Log "Baseline: $stickmanBaseline"
+    Write-Log "Current HEAD: $currentHead"
+
+    if ($currentHead -and ($currentHead -ne $stickmanBaseline -or $Force)) {
+        $changedFiles = Get-Changed-Files -RepoPath $stickmanRoot -FromCommit $stickmanBaseline
+        Write-Log "Changed files: $($changedFiles.Count)"
+
+        if ($changedFiles.Count -gt 0 -or $Force) {
+            $hasChanges = $true
+            $syncedSources += "stickman-video-director"
+            $synced = 0
+            $skipped = 0
+            foreach ($file in $changedFiles) {
+                $result = Sync-File -SrcRoot $stickmanRoot -RelPath $file -Source "stickman" -DestPrefix $stickmanDestPrefix -SourceSkipPatterns $stickmanSkipPatterns -SourceKeepPatterns $stickmanKeepPatterns
+                if ($result) { $synced++ } else { $skipped++ }
+            }
+            $totalSynced += $synced
+            $totalSkipped += $skipped
+            Write-Log "stickman-video-director: $synced synced, $skipped skipped"
+            $stickmanNewHead = $currentHead
+        }
+    }
+    else {
+        Write-Log "No changes since last sync"
+    }
+}
+else {
+    Write-Log "Source repo not found: $stickmanRoot" -Level "WARN"
+}
+
 # 修复 bun.lock
 if ($hasChanges -and -not $DryRun) {
     Write-Log ""
@@ -623,12 +726,14 @@ if ($hasChanges -and -not $DryRun) {
     }
 
     # 提交
+    # NOTE: no `2>&1` redirection on git calls — with EAP=Stop, PowerShell 5
+    # turns redirected stderr (e.g. CRLF hints) into terminating errors.
     Write-Log ""
     Write-Log "=== COMMITTING ==="
-    git -C $boninRoot add -A 2>&1 | Out-Null
+    git -C $boninRoot add -A | Out-Null
     $sourceTag = if ($syncedSources.Count -gt 0) { $syncedSources -join ', ' } else { "no source" }
     $commitMsg = "feat: auto-sync from upstream ($sourceTag) - $totalSynced files synced"
-    git -C $boninRoot commit -m $commitMsg 2>&1 | Out-Null
+    git -C $boninRoot commit -m $commitMsg | Out-Null
     Write-Log "Committed: $commitMsg"
 
     # Advance new-source baselines after a successful commit (added 2026-11).
@@ -641,6 +746,10 @@ if ($hasChanges -and -not $DryRun) {
         Update-Source-Baseline -Name "handraw-style" -Commit $handrawNewHead -Initial $handrawInitialBaseline
         $handrawNewHead = $null
     }
+    if ($stickmanNewHead) {
+        Update-Source-Baseline -Name "stickman-video-director" -Commit $stickmanNewHead -Initial $stickmanInitialBaseline
+        $stickmanNewHead = $null
+    }
 
     # 推送（重试 3 次）
     Write-Log ""
@@ -648,7 +757,7 @@ if ($hasChanges -and -not $DryRun) {
     $pushed = $false
     for ($i = 1; $i -le 3; $i++) {
         Write-Log "Push attempt $i of 3..."
-        git -C $boninRoot push origin master 2>&1 | Out-Null
+        git -C $boninRoot push origin master | Out-Null
         if ($LASTEXITCODE -eq 0) {
             $pushed = $true
             Write-Log "Push succeeded"
