@@ -206,6 +206,24 @@ npx skills add BoninEDU/bonin-design
 | ![list](./screenshots/xhs-images-layouts/list.webp) | ![comparison](./screenshots/xhs-images-layouts/comparison.webp) | ![flow](./screenshots/xhs-images-layouts/flow.webp) |
 | list | comparison | flow |
 
+#### bonin-stickman-video-director
+
+火柴人视频导演。把主题、文章或脚本转成火柴人视频的全栈技能，来自上游 [stickman-video-director](https://github.com/kaomei/stickman-video-director)（MIT）。三种使用模式：
+
+- **Director 模式（A1–A5）**：先生成分镜板，再把每个镜头交给 Autopilot 渲染。适合一次做多个镜头的情况。
+- **A6 · Amber Noir**：参考图引导执行 + 旁白 + 收尾（引用/字幕锁死），适合有风格定位的系列。
+- **Autopilot 模式（B1–B5）**：本地渲染带旁白、字幕和微动画的完整视频，支持本地 Python/Node 工具链，也支持 Gemini API 生成关键帧。
+
+```bash
+# 只装这个技能
+npx skills add BoninEDU/bonin-skills --skill bonin-stickman-video-director
+
+# 全局安装
+npx skills add BoninEDU/bonin-skills -g --skill bonin-stickman-video-director
+```
+
+**依赖提示**：Autopilot 渲染需要本地 Node.js + `npm install`；AI 生成可选填 `GEMINI_API_KEY`。
+
 #### bonin-infographic
 
 专业信息图生成器，支持 21 种布局和 21 种视觉风格。分析内容后推荐布局×风格组合，生成可发布的信息图。

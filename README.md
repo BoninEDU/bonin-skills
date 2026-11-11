@@ -88,6 +88,7 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 | **bonin-push** | 推送引擎 — 把本地 `~/.claude/skills/bonin-*` 一键同步到 github repo（master + md 双分支）|
 | **bonin-electron-extract** | Electron 逆向 — 从已安装的 Electron 应用（`.asar`）提取资源与 JavaScript，有 `.js.map` 时还原源码，否则用 Prettier 格式化压缩代码 |
 | **bonin-wechat-summary** | 群聊精华 — 把微信群聊记录提炼成结构化简报（正常版 / 毒舌版），维护跨次运行的群聊历史、群友画像与事实记忆 |
+| **bonin-stickman-video-director** | 火柴人视频导演 — 把主题 / 文章 / 脚本转成火柴人视频：Director 模式（A1–A5 分镜板）+ A6 琥珀黑色调（执行 + 旁白 + 收尾）+ B 系列 Autopilot（本地渲染带字幕带微动画视频）。MIT 上游署名保留 |
 
 
 ## 工作流

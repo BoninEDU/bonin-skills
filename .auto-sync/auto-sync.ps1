@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # Bonin Skills 自动化同步程序
 # Auto-Sync Program for bonin-skills
 #
@@ -35,7 +35,30 @@ $boninRoot = "d:\Repo\bonin-skills"
 $baoyuBaseline = "505a7e1"
 $ljgBaseline = "0b77aa2"
 
-$binaryExts = @(".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".lock", ".lockb", ".pdf", ".zip", ".woff", ".woff2", ".ttf", ".eot")
+# ------------------------------------------------------------
+# Sources added 2026-11: stickman-video-director (additive,
+# backward compatible with baoyu/ljg wiring already present).
+# ------------------------------------------------------------
+$stickmanRoot = "d:\Repo\stickman-video-director"
+$stickmanInitialBaseline = "2f018c9112a87874ea83f88549ad93837b30b8df"
+$stickmanDestPrefix = "skills/bonin-stickman-video-director"
+$stickmanSkipPatterns = @(
+    '^\.github/',
+    '^assets/readme/',
+    '^assets/sponsors/',
+    '^scripts/optimize-readme-previews\.sh$',
+    '^README(\.[a-zA-Z-]+)?\.md$',
+    '^tests/reports/',
+    '^tests/verify-chinese-onboarding\.py$',
+    '^tests/verify-localized-readmes\.py$',
+    '^tests/verify-thumbnail-kit\.py$',
+    '^tests/verify-voice-continuity\.py$',
+    '^tests/verify-first-use-guidance\.py$',
+    '^tests/verify-readmes\.sh$'
+)
+$stickmanKeepPatterns = @('^LICENSE$', '^\.gitignore$', '^package-lock\.json$')
+
+$binaryExts = @(".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".lock", ".lockb", ".pdf", ".zip", ".woff", ".woff2", ".ttf", ".eot", ".mp3", ".wav", ".mp4", ".m4a", ".ogg", ".flac")
 $skipPatterns = @("^LICENSE$", "^\.gitignore$", "^package-lock\.json$", "^bun\.lockb$", "^\.releaserc\.yml$")
 
 # ============================================================
@@ -73,6 +96,44 @@ function Get-Repo-Head {
 function Get-Changed-Files {
     param([string]$RepoPath, [string]$FromCommit)
     return @(git -C $RepoPath diff --diff-filter=AM --name-only "$FromCommit..HEAD" 2>$null)
+}
+
+function Get-Source-Baseline {
+    param([string]$Name, [string]$Initial)
+    $baselinesFile = Join-Path $boninRoot ".auto-sync\baselines.json"
+    if (Test-Path $baselinesFile) {
+        try {
+            $json = Get-Content -Path $baselinesFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($json.PSObject.Properties.Name -contains $Name) {
+                return $json.$Name.baseline
+            }
+        } catch {
+            Write-Log "baselines.json parse error for $Name, using initial" -Level "WARN"
+        }
+    }
+    return $Initial
+}
+
+function Update-Source-Baseline {
+    param([string]$Name, [string]$NewBaseline)
+    $baselinesFile = Join-Path $boninRoot ".auto-sync\baselines.json"
+    $now = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss")
+    if (Test-Path $baselinesFile) {
+        try {
+            $json = Get-Content -Path $baselinesFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($json.PSObject.Properties.Name -notcontains $Name) {
+                $entry = [pscustomobject]@{ initial = $NewBaseline; previous = $NewBaseline; baseline = $NewBaseline; updated_at = $now }
+                $json | Add-Member -NotePropertyName $Name -NotePropertyValue $entry
+            } else {
+                $json.$Name.previous = $json.$Name.baseline
+                $json.$Name.baseline = $NewBaseline
+                $json.$Name.updated_at = $now
+            }
+            $json | ConvertTo-Json -Depth 5 | Set-Content -Path $baselinesFile -Encoding UTF8NoBOM
+        } catch {
+            Write-Log "Failed to update baselines.json for ${Name}: $_" -Level "WARN"
+        }
+    }
 }
 
 # ============================================================
@@ -114,6 +175,14 @@ function Transform-Content {
         $sshReplacement = 'git' + $at + 'github.com:BoninEDU/bonin-skills.git'
         $Content = $Content -replace $sshPattern, $sshReplacement
     }
+    elseif ($Source -eq "stickman") {
+        # Attribution-preserving sync: strip upstream promo tracking params
+        # but keep all original attribution URLs and copyright notices (MIT).
+        $Content = $Content -replace '\?utm_source=crazykaomei-aini-202610&utm_medium=xcom', ''
+        # Normalize CRLF -> LF (upstream autocrlf=true working tree is CRLF,
+        # but skill manifest SHA-256 fingerprints are computed on LF).
+        $Content = $Content -replace "`r`n", "`n"
+    }
 
     return $Content
 }
@@ -126,6 +195,10 @@ function Map-Path {
     elseif ($Source -eq "ljg") {
         return $RelativePath -creplace 'ljg', 'bonin'
     }
+    elseif ($Source -eq "stickman") {
+        # Keep package-internal directory names as-is
+        return $RelativePath
+    }
     return $RelativePath
 }
 
@@ -134,10 +207,28 @@ function Map-Path {
 # ============================================================
 
 function Sync-File {
-    param([string]$SrcRoot, [string]$RelPath, [string]$Source)
+    param(
+        [string]$SrcRoot,
+        [string]$RelPath,
+        [string]$Source,
+        [string]$DestPrefix = "",
+        [string[]]$SourceSkipPatterns = @(),
+        [string[]]$SourceKeepPatterns = @()
+    )
 
     $srcFile = Join-Path $SrcRoot $RelPath
+
+    # Source-level keep-override: a path matching keep-pattern bypasses the
+    # global skip-patterns (e.g. stickman's LICENSE / package-lock.json).
+    $keepOverride = $false
+    foreach ($pattern in $SourceKeepPatterns) {
+        if ($RelPath -match $pattern) { $keepOverride = $true; break }
+    }
+
     $destRelPath = Map-Path -RelativePath $RelPath -Source $Source
+    if ($DestPrefix) {
+        $destRelPath = "$DestPrefix/$destRelPath"
+    }
     $destFile = Join-Path $boninRoot $destRelPath
 
     if (-not (Test-Path $srcFile)) {
@@ -145,10 +236,18 @@ function Sync-File {
         return $false
     }
 
-    foreach ($pattern in $skipPatterns) {
-        if ($RelPath -match $pattern) {
-            Write-Log "  SKIP (pattern): $RelPath"
-            return $false
+    if (-not $keepOverride) {
+        foreach ($pattern in $skipPatterns) {
+            if ($RelPath -match $pattern) {
+                Write-Log "  SKIP (global): $RelPath"
+                return $false
+            }
+        }
+        foreach ($pattern in $SourceSkipPatterns) {
+            if ($RelPath -match $pattern) {
+                Write-Log "  SKIP (source): $RelPath"
+                return $false
+            }
         }
     }
 
@@ -209,12 +308,12 @@ function Invoke-Audit {
     }
     Write-Log "  Checked $($skills.Count) skills"
 
-    # 2. 检查残留作者信息
+    # 2. 检查残留作者信息（stickman 源保留 MIT 署名，故豁免 bonin-stickman-video-director 目录）
     Write-Log "Checking for residual author info..."
     $forbidden = @("JimLiu", "lijigang", "baoyu-skills", "ljg-skills", "继刚", "李继刚", "宝玉")
     foreach ($kw in $forbidden) {
         $matches = @(Select-String -Path (Join-Path $boninRoot "**\*") -Pattern $kw -SimpleMatch -ErrorAction SilentlyContinue |
-            Where-Object { $_.Path -notmatch "\\.git\\" -and $_.Path -notmatch "node_modules" -and $_.Path -notmatch "\\.auto-sync\\" })
+            Where-Object { $_.Path -notmatch "\\.git\\" -and $_.Path -notmatch "node_modules" -and $_.Path -notmatch "\\.auto-sync\\" -and $_.Path -notmatch "bonin-stickman-video-director" })
         if ($matches.Count -gt 0) {
             $issues += "FOUND '$kw': $($matches.Count) matches"
         }
@@ -335,6 +434,49 @@ else {
     Write-Log "Source repo not found: $ljgRoot" -Level "WARN"
 }
 
+# 处理 stickman-video-director（源基线从 baselines.json 读取并自动推进）
+Write-Log ""
+Write-Log "=== SOURCE: stickman-video-director ==="
+$syncedSources = [System.Collections.Generic.List[string]]::new()
+$stickmanBaseline = Get-Source-Baseline -Name "stickman-video-director" -Initial $stickmanInitialBaseline
+if (Test-Path $stickmanRoot) {
+    $currentHead = Get-Repo-Head -RepoPath $stickmanRoot
+    Write-Log "Baseline: $stickmanBaseline"
+    Write-Log "Current HEAD: $currentHead"
+
+    if ($currentHead -and ($currentHead -ne $stickmanBaseline -or $Force)) {
+        $changedFiles = Get-Changed-Files -RepoPath $stickmanRoot -FromCommit $stickmanBaseline
+        Write-Log "Changed files: $($changedFiles.Count)"
+
+        if ($changedFiles.Count -gt 0 -or $Force) {
+            $hasChanges = $true
+            $syncedSources.Add("stickman-video-director")
+            $synced = 0
+            $skipped = 0
+            foreach ($file in $changedFiles) {
+                $result = Sync-File `
+                    -SrcRoot $stickmanRoot `
+                    -RelPath $file `
+                    -Source "stickman" `
+                    -DestPrefix $stickmanDestPrefix `
+                    -SourceSkipPatterns $stickmanSkipPatterns `
+                    -SourceKeepPatterns $stickmanKeepPatterns
+                if ($result) { $synced++ } else { $skipped++ }
+            }
+            $totalSynced += $synced
+            $totalSkipped += $skipped
+            Write-Log "stickman-video-director: $synced synced, $skipped skipped"
+            $stickmanNewHead = $currentHead
+        }
+    }
+    else {
+        Write-Log "No changes since last sync"
+    }
+}
+else {
+    Write-Log "Source repo not found: $stickmanRoot" -Level "WARN"
+}
+
 # 修复 bun.lock
 if ($hasChanges -and -not $DryRun) {
     Write-Log ""
@@ -360,10 +502,16 @@ if ($hasChanges -and -not $DryRun) {
     # 提交
     Write-Log ""
     Write-Log "=== COMMITTING ==="
-    git -C $boninRoot add -A 2>&1 | Out-Null
+    git -C $boninRoot add -A | Out-Null  # NO 2>&1: stderr hints under EAP=Stop would terminate
     $commitMsg = "feat: auto-sync from upstream - $totalSynced files synced"
-    git -C $boninRoot commit -m $commitMsg 2>&1 | Out-Null
+    git -C $boninRoot commit -m $commitMsg | Out-Null
     Write-Log "Committed: $commitMsg"
+
+    # 推进 baselines.json（stickman 源）
+    if ($syncedSources -contains "stickman-video-director" -and $stickmanNewHead) {
+        Update-Source-Baseline -Name "stickman-video-director" -NewBaseline $stickmanNewHead
+        Write-Log "stickman baseline advanced -> $stickmanNewHead"
+    }
 
     # 推送（重试 3 次）
     Write-Log ""
@@ -371,7 +519,7 @@ if ($hasChanges -and -not $DryRun) {
     $pushed = $false
     for ($i = 1; $i -le 3; $i++) {
         Write-Log "Push attempt $i of 3..."
-        git -C $boninRoot push origin master 2>&1 | Out-Null
+        git -C $boninRoot push origin main | Out-Null
         if ($LASTEXITCODE -eq 0) {
             $pushed = $true
             Write-Log "Push succeeded"
