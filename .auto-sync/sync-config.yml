@@ -118,6 +118,12 @@ sync:
     - ".woff2"
     - ".ttf"
     - ".eot"
+    - ".mp3"
+    - ".wav"
+    - ".mp4"
+    - ".m4a"
+    - ".ogg"
+    - ".flac"
   # 是否在同步后自动提交
   auto_commit: true
   # 是否在同步后自动推送

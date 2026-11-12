@@ -102,7 +102,7 @@ npm run doctor
 画风样片目录（上游公开 README）：[导演模式](https://github.com/kaomei/stickman-video-director/blob/main/README.zh-CN.md#a-styles) ·
 [全自动模式](https://github.com/kaomei/stickman-video-director/blob/main/README.zh-CN.md#b-styles)。
 
-## 验证（2026-11-10 实跑记录）
+## 验证（2026-11-10 至 2026-11-12 实跑记录）
 
 | 项目 | 结果 |
 |------|------|
@@ -110,7 +110,8 @@ npm run doctor
 | 自检 `npm run doctor` | `node/ffmpeg/ffprobe/canvas/sharp/fonts` 全部 `true`；`gemini_key_present: false`（未配置，属预期） |
 | Node 单元测试 `node --test tests/*.test.mjs` | 120 项：**120 通过 / 0 失败**（2026-11-10 修复后。最初 84/36，成因有二：① 仓库 `core.autocrlf=true` 把指纹锁定的 LF 文本转成 CRLF，导致 33 项指纹/跨行断言失败——已通过本目录 `.gitattributes`（`* -text`）修复；② 符号链接 EPERM 3 项——已开启 Windows 开发者模式修复） |
 | Python 单测 `python -m unittest discover -s tests -p 'test_a6_references.py'` | 20 项：**20 通过 / 0 失败**（同上，开发者模式开启后符号链接用例通过） |
-| 仓库级校验 `tests/verify-*.py` | `verify-a6-guidance`、`verify-ab-preservation`、`verify-b-common-quality`、`verify-b1-baseline`、`verify-b1-production-standard`、`verify-cozy-storytelling`、`verify-historical-cartoon` 通过（`ab-preservation` 与 `historical-cartoon` 的失败同为 CRLF 指纹问题，已随 `.gitattributes` 修复）；`verify-a6-finishing` 仍失败：上游写死 macOS 系统字体路径 `/System/Library/Fonts/Supplemental/Impact.ttf`，Windows/Linux 均无法通过，属上游平台限制 |
+| 仓库级校验 `tests/verify-*.py` | 8 个脚本全部通过；`verify-a6-finishing` 与 A6 渲染器已增加 Windows 字体候选，并于 2026-11-12 前实跑通过 |
+| GitHub 在线安装 | `npx skills add BoninEDU/bonin-skills --skill bonin-stickman-video-director --agent codex --copy -y` 在干净目录落盘 233 个文件；安装副本 `npm ci` 成功且 `npm run doctor` 六项检查全部为 `true`（2026-11-12） |
 
 未验证项：真实付费生成链路（图片/语音/视频服务）、B4/B5 整片渲染的完整端到端流程（需要真实素材与授权调用）。上述状态如实标注，不代表“已调试可用”。
 

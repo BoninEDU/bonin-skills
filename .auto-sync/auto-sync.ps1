@@ -129,7 +129,8 @@ function Update-Source-Baseline {
                 $json.$Name.baseline = $NewBaseline
                 $json.$Name.updated_at = $now
             }
-            $json | ConvertTo-Json -Depth 5 | Set-Content -Path $baselinesFile -Encoding UTF8NoBOM
+            $jsonText = $json | ConvertTo-Json -Depth 5
+            [System.IO.File]::WriteAllText($baselinesFile, $jsonText, [System.Text.UTF8Encoding]::new($false))
         } catch {
             Write-Log "Failed to update baselines.json for ${Name}: $_" -Level "WARN"
         }
@@ -499,6 +500,12 @@ if ($hasChanges -and -not $DryRun) {
         Exit-With-Error "Audit failed. Changes not committed."
     }
 
+    # 推进 baselines.json（stickman 源），必须与同步文件进入同一提交。
+    if ($syncedSources -contains "stickman-video-director" -and $stickmanNewHead) {
+        Update-Source-Baseline -Name "stickman-video-director" -NewBaseline $stickmanNewHead
+        Write-Log "stickman baseline advanced -> $stickmanNewHead"
+    }
+
     # 提交
     Write-Log ""
     Write-Log "=== COMMITTING ==="
@@ -506,12 +513,6 @@ if ($hasChanges -and -not $DryRun) {
     $commitMsg = "feat: auto-sync from upstream - $totalSynced files synced"
     git -C $boninRoot commit -m $commitMsg | Out-Null
     Write-Log "Committed: $commitMsg"
-
-    # 推进 baselines.json（stickman 源）
-    if ($syncedSources -contains "stickman-video-director" -and $stickmanNewHead) {
-        Update-Source-Baseline -Name "stickman-video-director" -NewBaseline $stickmanNewHead
-        Write-Log "stickman baseline advanced -> $stickmanNewHead"
-    }
 
     # 推送（重试 3 次）
     Write-Log ""
