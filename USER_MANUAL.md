@@ -133,7 +133,7 @@ bonin-skills/
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| Content & Visualization | 8 | Images, cards, infographics, slides, presentations |
+| Content & Visualization | 9 | Images, cards, infographics, slides, presentations, stickman videos |
 | AI Generation | 2 | Multi-provider image generation, Gemini Web |
 | Publishing | 3 | X/Twitter, WeChat Official Account, Weibo |
 | Utility | 8 | Image compression, diagrams, formatting, translation, URL conversion, etc. |
@@ -491,7 +491,7 @@ Paper reader for non-academics. Takes a paper and extracts its ideas for persona
 | `/bonin-paper` | Start paper reading |
 | Natural language | Provide an arXiv link, PDF, or paper title |
 
-**Output**: Org-mode file to `~/Documents/notes/`
+**Output**: Markdown file to `~/Documents/notes/`
 
 ---
 
@@ -668,7 +668,7 @@ Roundtable discussion tool. Simulates multiple experts engaging in deep discussi
 
 **Version**: 1.0.0 | **Triggers**: `旅行研究`, `博物馆功课`, `古建功课`, `travel research`
 
-Deep travel research workflow. Input a city name to auto-generate a structured knowledge document (Org-mode) + portable reference cards (PNG). Covers historical background, museum highlights, archaeological significance, and architectural heritage.
+Deep travel research workflow. Input a city name to auto-generate a structured knowledge document (Markdown) + portable reference cards (PNG). Covers historical background, museum highlights, archaeological significance, and architectural heritage.
 
 | Command | Description |
 |---------|-------------|
