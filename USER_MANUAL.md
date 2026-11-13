@@ -73,6 +73,27 @@ cp -r bonin-skills/skills/bonin-* ~/.claude/skills/
 # 3. Restart Claude Code to reload skills
 ```
 
+### Option 3: Install for Other Agents
+
+`npx skills add` recognizes the common agent layouts. For a machine-wide setup, link each skill directory into the agent's skills folder:
+
+| Agent | Skills directory |
+|-------|------------------|
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Trae / Trae CN | `~/.trae/skills/`, `~/.trae-cn/skills/` |
+| CodeBuddy | `~/.codebuddy/skills/` |
+| WorkBuddy | `~/.agents/skills/` |
+| Gemini CLI | `~/.gemini/skills/` |
+
+Windows (PowerShell) example:
+
+```powershell
+New-Item -ItemType Junction `
+  -Path "$env:USERPROFILE\.claude\skills\bonin-card" `
+  -Target "D:\repo\bonin-skills\skills\bonin-card"
+```
+
 ### Install bonin-card Dependencies
 
 `bonin-card` requires Playwright for HTML screenshot capture:
@@ -267,6 +288,21 @@ Presentation builder with two styles:
 | `/bonin-present -s` | Slogan style |
 
 **Output**: Single-file HTML to `~/Downloads/`
+
+---
+
+#### bonin-stickman-video-director
+
+**Version**: 1.0.0 | **Triggers**: `火柴人视频`, `stickman video`, `分镜转视频`, `autopilot video`
+
+Stickman video director (the 48th skill). Director mode (A1–A5) produces approved storyboards and standalone video prompts; A6 Amber Noir handles reference-driven production, narration and finishing; Autopilot (B1–B5) renders narrated, captioned videos with micro-animation and sound effects locally. Ported from an MIT upstream project; license and attribution are kept verbatim.
+
+| Command | Description |
+|---------|-------------|
+| `/bonin-stickman-video-director` | Start the stickman video workflow |
+| Natural language | Ask for a stickman video, or provide an article/script |
+
+**Runtime**: Director mode needs no Node/FFmpeg/API key. A6 and B modes need Node.js 20+, FFmpeg/FFprobe, Python 3 (A6 scripts) and an optional `GEMINI_API_KEY`. After installation run `npm ci` in `skills/directing-stickman-videos/`.
 
 ---
 

@@ -73,6 +73,27 @@ cp -r bonin-skills/skills/bonin-* ~/.claude/skills/
 # 3. 重启 Claude Code 以加载技能
 ```
 
+### 方式三：安装到其他 Agent
+
+`npx skills add` 会自动识别常见 Agent 布局。若要整机长期可用，可把技能目录链接到对应 Agent 的技能目录：
+
+| Agent | 技能目录 |
+|-------|----------|
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Trae / Trae CN | `~/.trae/skills/`、`~/.trae-cn/skills/` |
+| CodeBuddy | `~/.codebuddy/skills/` |
+| WorkBuddy | `~/.agents/skills/` |
+| Gemini CLI | `~/.gemini/skills/` |
+
+Windows（PowerShell）示例：
+
+```powershell
+New-Item -ItemType Junction `
+  -Path "$env:USERPROFILE\.claude\skills\bonin-card" `
+  -Target "D:\repo\bonin-skills\skills\bonin-card"
+```
+
 ### 安装 bonin-card 依赖
 
 `bonin-card` 需要 Playwright 进行 HTML 截图：
@@ -267,6 +288,21 @@ AI 漫画生成器，支持多种艺术风格。将故事内容转化为漫画�
 | `/bonin-present -s` | 标语流模式 |
 
 **输出**：单文件 HTML 到 `~/Downloads/`
+
+---
+
+#### bonin-stickman-video-director
+
+**版本**：1.0.0 | **触发词**：`火柴人视频`、`stickman video`、`分镜转视频`、`autopilot video`
+
+火柴人视频导演（第 48 个技能）。Director 模式（A1–A5）输出已确认分镜与独立视频提示词；A6 Amber Noir 做参考图驱动的执行、旁白与收尾；Autopilot（B1–B5）在本地渲染带旁白、字幕、微动画与音效的整片。上游为 MIT 项目，许可证与署名原样保留。
+
+| 命令 | 说明 |
+|------|------|
+| `/bonin-stickman-video-director` | 启动火柴人视频工作流 |
+| 自然语言 | 说“做一条火柴人视频”，或提供文章/脚本 |
+
+**运行依赖**：Director 模式不需要 Node/FFmpeg/API Key；A6 与 B 模式需要 Node.js 20+、FFmpeg/FFprobe、Python 3（A6 脚本）以及可选的 `GEMINI_API_KEY`。安装后需在 `skills/directing-stickman-videos/` 执行 `npm ci`。
 
 ---
 

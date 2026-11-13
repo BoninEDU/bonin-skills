@@ -223,7 +223,7 @@ Start-ScheduledTask -TaskName 'BoninSkillsAutoSync'
 
 1. 检查网络连接
 2. 检查 GitHub 认证（`git config --global credential.helper`）
-3. 手动推送：`git -C d:\Repo\bonin-skills push origin master`
+3. 手动推送：`git -C d:\Repo\bonin-skills push origin main`
 
 ### 审计失败
 

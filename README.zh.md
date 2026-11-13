@@ -19,13 +19,26 @@ Bonin AIGC 分享的 AI Agent 技能集（适用于 Claude Code、Codex 等）�
 
 ## 安装
 
-> **提示**：本仓库已收录 20+ 个 skill，请按需安装你真正会用到的那几个，不要一次性全装 —— 每个加载的 skill 都会在 Agent 每次运行时占用额外上下文。
+> **提示**：本仓库已收录 48 个 skill，请按需安装你真正会用到的那几个，不要一次性全装 —— 每个加载的 skill 都会在 Agent 每次运行时占用额外上下文。
 
 ### 快速安装（推荐）
 
 ```bash
 npx skills add BoninEDU/bonin-skills
 ```
+
+默认分支 `main` 已统一为 Markdown，安装时无需再指定 `#md`。
+
+### 各 Agent 的技能目录
+
+| Agent | 技能目录 |
+|-------|----------|
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Trae / Trae CN | `~/.trae/skills/`、`~/.trae-cn/skills/` |
+| CodeBuddy | `~/.codebuddy/skills/` |
+| WorkBuddy | `~/.agents/skills/`（WorkBuddy 读取该目录） |
+| Gemini CLI | `~/.gemini/skills/` |
 
 ### Codex 项目级安装
 
@@ -126,7 +139,19 @@ clawhub install bonin-markdown-to-html
 
 ## 可用技能
 
-技能分为三大类：
+本仓库共 **48 个技能**。完整索引如下，详细说明见后文分类章节：
+
+| 分类 | 技能 |
+|------|------|
+| 内容与可视化 | `bonin-article-illustrator`、`bonin-card`、`bonin-comic`、`bonin-cover-image`、`bonin-handraw-style`、`bonin-image-cards`、`bonin-infographic`、`bonin-present`、`bonin-slide-deck`、`bonin-stickman-video-director`、`bonin-xhs-images` |
+| 知识与思维 | `bonin-book`、`bonin-book-to-skill`、`bonin-invest`、`bonin-learn`、`bonin-library`、`bonin-paper`、`bonin-paper-flow`、`bonin-paper-river`、`bonin-plain`、`bonin-qa`、`bonin-rank`、`bonin-read`、`bonin-think`、`bonin-word`、`bonin-word-flow`、`bonin-writes` |
+| 对话与关系 | `bonin-relationship`、`bonin-roundtable`、`bonin-travel` |
+| 发布 | `bonin-post-to-wechat`、`bonin-post-to-weibo`、`bonin-post-to-x` |
+| AI 生成 | `bonin-danger-gemini-web`、`bonin-image-gen`（已弃用）、`bonin-imagine` |
+| 工具 | `bonin-compress-image`、`bonin-danger-x-to-markdown`、`bonin-diagram`、`bonin-electron-extract`、`bonin-format-markdown`、`bonin-markdown-to-html`、`bonin-skill-map`、`bonin-translate`、`bonin-url-to-markdown`、`bonin-wechat-summary`、`bonin-youtube-transcript` |
+| 维护 | `bonin-push` |
+
+以下为详细说明：
 
 ### 设计技能推荐：bonin-design
 
@@ -208,7 +233,7 @@ npx skills add BoninEDU/bonin-design
 
 #### bonin-stickman-video-director
 
-火柴人视频导演。把主题、文章或脚本转成火柴人视频的全栈技能，来自上游 [stickman-video-director](https://github.com/kaomei/stickman-video-director)（MIT）。三种使用模式：
+火柴人视频导演（第 48 个技能）。把主题、文章或脚本转成火柴人视频的全栈技能，来自上游 [stickman-video-director](https://github.com/kaomei/stickman-video-director)（MIT）。三种使用模式：
 
 - **Director 模式（A1–A5）**：先生成分镜板，再把每个镜头交给 Autopilot 渲染。适合一次做多个镜头的情况。
 - **A6 · Amber Noir**：参考图引导执行 + 旁白 + 收尾（引用/字幕锁死），适合有风格定位的系列。

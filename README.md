@@ -1,6 +1,6 @@
 # bonin-skills
 
-我的 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 自定义技能集。
+Bonin AIGC 分享的 AI Agent 技能集，共 **48 个技能**，适用于 Claude Code、Codex、Trae、WorkBuddy、CodeBuddy、Gemini CLI 等支持 `SKILL.md` 的 Agent。
 
 ## Bonin AIGC
 
@@ -12,20 +12,16 @@
 
 ## 安装
 
-使用 [skills CLI](https://github.com/vercel-labs/skills)（基于 `npx`）一行安装：
+仓库默认分支为 `main`，内容为 Markdown（`.md`），无需再切换 `#md` 分支。
+
+使用 [skills CLI](https://github.com/vercel-labs/skills)（基于 `npx`）安装：
 
 ```bash
-# 安装全部技能（全局，org-mode 格式）
+# 安装全部技能（全局）
 npx skills add BoninEDU/bonin-skills -g --all
-
-# 安装全部技能（Markdown 格式，适用于 Obsidian / VSCode / Notion 等）
-npx skills add BoninEDU/bonin-skills#md -g --all
 
 # 安装单个技能
 npx skills add BoninEDU/bonin-skills -g --skill bonin-card
-
-# 安装单个技能（Markdown 格式）
-npx skills add BoninEDU/bonin-skills#md -g --skill bonin-card
 
 # 安装多个指定技能
 npx skills add BoninEDU/bonin-skills -g --skill bonin-card --skill bonin-learn
@@ -41,8 +37,28 @@ npx skills add BoninEDU/bonin-skills -l
 | `-g` | 全局安装到 `~/.claude/skills/`（推荐）。不加则装到当前项目 `.claude/skills/` |
 | `--skill <name>` | 指定安装某个技能，可重复使用 |
 | `--all` | 安装仓库内全部技能 |
-| `#md` | 从 `md` branch 安装 Markdown 格式版本（默认为 org-mode） |
 | `-l` | 仅列出可用技能，不安装 |
+
+### 各 Agent 的技能目录
+
+`npx skills add` 会自动识别常见 Agent 布局；也可以把技能目录链接到下列位置：
+
+| Agent | 技能目录 |
+|-------|----------|
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Trae / Trae CN | `~/.trae/skills/`、`~/.trae-cn/skills/` |
+| CodeBuddy | `~/.codebuddy/skills/` |
+| WorkBuddy | `~/.agents/skills/`（WorkBuddy 读取该目录） |
+| Gemini CLI | `~/.gemini/skills/` |
+
+Windows PowerShell 创建目录链接示例：
+
+```powershell
+New-Item -ItemType Junction `
+  -Path "$env:USERPROFILE\.claude\skills\bonin-stickman-video-director" `
+  -Target "D:\repo\bonin-skills\skills\bonin-stickman-video-director"
+```
 
 ### bonin-card 依赖
 
@@ -52,44 +68,111 @@ npx skills add BoninEDU/bonin-skills -l
 cd ~/.claude/skills/bonin-card && npm install && npx playwright install chromium
 ```
 
+### bonin-stickman-video-director 依赖
+
+导演模式（A1–A5）不需要运行时。A6 与 Autopilot（B1–B5）需要：
+
+```bash
+cd ~/.claude/skills/bonin-stickman-video-director/skills/directing-stickman-videos
+npm ci
+npm run doctor
+```
+
+- Node.js ≥ 20
+- FFmpeg / FFprobe
+- Python 3（仅 A6 脚本）
+- 可选 `GEMINI_API_KEY`（付费生成前须先报价并取得授权）
+
 ### 替代方式：git clone
 
 ```bash
-# org-mode 版本
 git clone https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/bonin-skills
-
-# Markdown 版本
-git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/bonin-skills
 ```
 
 ## 技能
 
+### 内容与可视化（11）
+
 | 技能 | 说明 |
 |------|------|
+| **bonin-article-illustrator** | 文章配图 — 按 Type × Style × Palette 为文章段落生成插图 |
 | **bonin-card** | 内容铸卡 — 将内容转为 PNG 视觉卡片（长图 `-l`、信息图 `-i`、多卡 `-m`、视觉笔记 `-v`、漫画 `-c`、白板 `-w`、大字 `-b`） |
-| **bonin-learn** | 概念解剖 — 从八个方向切开一个概念（历史、辩证、现象、语言、形式、存在、美感、元反思），压成一句顿悟 |
-| **bonin-paper** | 论文阅读 — 为非学术人士提取论文核心想法，重理解不重批判 |
-| **bonin-paper-river** | 论文溯源 — 倒读法，递归挖前序论文（最多5层）+ 最新进展，从源头讲述问题演化史 |
-| **bonin-book** | 拆书 — 以「问题」为轴心一条线：作者答什么问题 / 之前共识怎么答 / 挪动了什么（delta）/ 结论 / 精神内核，收尾一张 ASCII 参考系图，各流派与作者钉进同一张图 |
-| **bonin-library** | 取景框借书卡 — 一本书 → 一幅「取景框」意向画面 → 一张 2050 图书馆借书卡（PNG）：真实封面 / 作者头像 / 书目；取景框 block 用费曼式讲透这幅意向画面，图解板白底黑墨、精确呈现它一眼即懂（画面含「你」才嵌 Bonin 墨像），卡身强调色从封面动态提取 |
-| **bonin-qa** | 信息提问机 — 把文章/论文/书的核心观点抽成 Q-A 链，Q 切要害，A 四段（结论 / 形式化 / 步骤 / 边界） |
-| **bonin-plain** | 白话引擎 — 把任何内容改写到聪明的十二岁小孩也能懂 |
-| **bonin-rank** | 降秩引擎 — 给一个领域，找出背后不可再少的独立生成器 |
-| **bonin-think** | 追本之箭 — 给一个观点或现象，纵向深钻到不可再分的本质 |
-| **bonin-word** | 单词精通 — 深度拆解一个英语单词的核心语义和顿悟时刻 |
-| **bonin-writes** | 写作引擎 — 像手术刀剖开一个观点，一层层剥到底。1000-1500 字 |
-| **bonin-invest** | 投资分析 — 核心判断项目是否是一台「秩序创造机器」 |
-| **bonin-read** | 伴读 — 陪你读任何文本，英文三层翻译（信达雅）+ 结构标注 + 深度提问 + 跨领域旁逸 |
-| **bonin-relationship** | 关系分析 — 五层结构诊断 + 精神分析，通过对话引导帮用户"看见"关系真实结构 |
-| **bonin-roundtable** | 圆桌讨论 — 求真导向的结构化多人辩证对话，每轮生成 ASCII 思考框架图 |
-| **bonin-travel** | 旅行研究 — 输入城市名，生成深度文化研究文档（org-mode）+ 便携卡片（PNG） |
-| **bonin-skill-map** | 技能地图 — 扫描所有已安装技能，渲染可视化总览 |
-| **bonin-present** | 演讲铸造器 — 默认高桥流（一页一关键词、奶白底墨字）；`-s` 标语流（VACAT/BIG STUDIOS 风：黑红双色块、ultra-bold、完整断言句撑屏）|
-| **bonin-push** | 推送引擎 — 把本地 `~/.claude/skills/bonin-*` 一键同步到 github repo（master + md 双分支）|
-| **bonin-electron-extract** | Electron 逆向 — 从已安装的 Electron 应用（`.asar`）提取资源与 JavaScript，有 `.js.map` 时还原源码，否则用 Prettier 格式化压缩代码 |
-| **bonin-wechat-summary** | 群聊精华 — 把微信群聊记录提炼成结构化简报（正常版 / 毒舌版），维护跨次运行的群聊历史、群友画像与事实记忆 |
-| **bonin-stickman-video-director** | 火柴人视频导演 — 把主题 / 文章 / 脚本转成火柴人视频：Director 模式（A1–A5 分镜板）+ A6 琥珀黑色调（执行 + 旁白 + 收尾）+ B 系列 Autopilot（本地渲染带字幕带微动画视频）。MIT 上游署名保留 |
+| **bonin-comic** | 知识漫画 — 多画风、多格布局的原创教育漫画 |
+| **bonin-cover-image** | 封面图 — 组合 11 种配色与 7 种渲染风格生成文章封面（2.35:1 / 16:9 / 1:1） |
+| **bonin-handraw-style** | 手绘风格技能集合 — 插画规划、情侣照编排、个人书库等子技能 |
+| **bonin-image-cards** | 图文卡系列 — 12 种风格、8 种布局的小红书/微信图文卡片 |
+| **bonin-infographic** | 信息图 — 21 种布局 × 22 种视觉风格的可发布信息图 |
+| **bonin-present** | 演讲铸造器 — 默认高桥流；`-s` 标语流 |
+| **bonin-slide-deck** | 幻灯片 — 从内容生成大纲、风格说明与逐张幻灯片图片 |
+| **bonin-stickman-video-director** | 火柴人视频导演（第 48 个技能）— Director（A1–A5）、A6 Amber Noir、Autopilot（B1–B5）；MIT 上游署名保留 |
+| **bonin-xhs-images** | 小红书图片卡（已由 `bonin-image-cards` 取代，保留兼容） |
 
+### 知识与思维（16）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-book** | 拆书 — 以「问题」为轴心，收尾一张 ASCII 参考系图 |
+| **bonin-book-to-skill** | 书籍转技能工具包 — PDF 解析、技能生成与批处理脚本 |
+| **bonin-invest** | 投资分析 — 核心判断项目是否是一台「秩序创造机器」 |
+| **bonin-learn** | 概念解剖 — 八个方向切开一个概念，压成一句顿悟 |
+| **bonin-library** | 取景框借书卡 — 一本书 → 一幅意向画面 → 一张 2050 图书馆借书卡（PNG） |
+| **bonin-paper** | 论文阅读 — 为非学术人士提取论文核心想法 |
+| **bonin-paper-flow** | 论文工作流 — `bonin-paper` → `bonin-library` 一气呵成 |
+| **bonin-paper-river** | 论文溯源 — 倒读法递归挖前序论文（最多 5 层）+ 最新进展 |
+| **bonin-plain** | 白话引擎 — 改写到聪明的十二岁小孩也能懂 |
+| **bonin-qa** | 信息提问机 — 把核心观点抽成 Q-A 链 |
+| **bonin-rank** | 降秩引擎 — 找出一个领域背后不可再少的独立生成器 |
+| **bonin-read** | 伴读 — 翻译、结构标注、深度提问与跨领域旁逸 |
+| **bonin-think** | 追本之箭 — 纵向深钻到不可再分的本质 |
+| **bonin-word** | 单词精通 — 拆解英语单词的核心语义与顿悟时刻 |
+| **bonin-word-flow** | 单词工作流 — `bonin-word` → `bonin-card -i` |
+| **bonin-writes** | 写作引擎 — 1000–1500 字，一层层剥到底 |
+
+### 对话与关系（3）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-relationship** | 关系分析 — 五层结构诊断 + 精神分析 |
+| **bonin-roundtable** | 圆桌讨论 — 求真导向的结构化多人辩证对话 |
+| **bonin-travel** | 旅行研究 — 城市深度文化研究文档（Markdown）+ 便携卡片（PNG） |
+
+### 发布（3）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-post-to-wechat** | 微信公众号 — 文章与贴图发布（API 或 Chrome CDP） |
+| **bonin-post-to-weibo** | 微博 — 普通微博与头条文章 |
+| **bonin-post-to-x** | X / Twitter — 普通推文与 X Articles |
+
+### AI 生成（3）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-danger-gemini-web** | Gemini Web 逆向适配器 — 文本、图像与多轮对话 |
+| **bonin-image-gen** | 多平台图像生成（已弃用，保留功能） |
+| **bonin-imagine** | 多平台图像生成 — OpenAI、Azure、Gemini、OpenRouter、DashScope、Z.ai、MiniMax、Seedream、Replicate 等 |
+
+### 工具（11）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-compress-image** | 图片压缩 — 默认 WebP，可转 PNG |
+| **bonin-danger-x-to-markdown** | X 转 Markdown — 推文与长文带 YAML front matter |
+| **bonin-diagram** | 图表 — 深色主题架构图、流程图、时序图、思维导图等 SVG |
+| **bonin-electron-extract** | Electron 逆向 — 从 `.asar` 提取资源与 JavaScript |
+| **bonin-format-markdown** | Markdown 格式化 — 标题、摘要、层级、列表与代码块 |
+| **bonin-markdown-to-html** | Markdown 转 HTML — 公众号兼容主题、代码高亮、Mermaid 等 |
+| **bonin-skill-map** | 技能地图 — 扫描并可视化所有已安装技能 |
+| **bonin-translate** | 精翻 — 中英互译与译文校对 |
+| **bonin-url-to-markdown** | URL 转 Markdown — Chrome CDP + 站点适配器 |
+| **bonin-wechat-summary** | 群聊精华 — 微信群聊结构化简报（正常版 / 毒舌版） |
+| **bonin-youtube-transcript** | YouTube 字幕 — 多语言字幕、翻译、章节与封面 |
+
+### 维护（1）
+
+| 技能 | 说明 |
+|------|------|
+| **bonin-push** | 推送引擎 — 把本地 `~/.claude/skills/bonin-*` 同步到 GitHub 仓库 |
 
 ## 工作流
 
@@ -102,9 +185,4 @@ git clone -b md https://github.com/BoninEDU/bonin-skills.git ~/.claude/plugins/b
 
 ## 输出格式
 
-技能提供两种输出格式，通过不同 branch 安装，功能完全相同：
-
-| Branch | 格式 | 适用场景 |
-|--------|------|----------|
-| `master`（默认） | Org-mode（`.org`） | Emacs / Denote 用户 |
-| `md` | Markdown（`.md`） | Obsidian / VSCode / Notion 等 Markdown 生态用户 |
+全仓库统一使用 Markdown（`.md`）。`main` 是唯一维护分支；历史 `md` 分支不再更新，安装时无需指定分支。

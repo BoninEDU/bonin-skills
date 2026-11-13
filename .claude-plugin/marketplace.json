@@ -2,7 +2,7 @@
   "name": "bonin-skills",
   "displayName": "Bonin AIGC Skills Collection",
   "description": "Bonin AIGC — Empower Super-Individuals and Super-Teams. Claude Code skills for paper reading, content casting, and writing workflows",
-  "version": "1.17.36",
+  "version": "2.7.0",
   "owner": {
     "name": "Bonin AIGC",
     "url": "https://www.boninaigc.top"
@@ -28,7 +28,7 @@
     {
       "name": "bonin-skills",
       "description": "Bonin AIGC's Claude Code skills collection — Empower Super-Individuals and Super-Teams",
-      "version": "1.17.36",
+      "version": "2.7.0",
       "source": "./"
     }
   ]

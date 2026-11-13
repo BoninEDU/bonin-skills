@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Claude Code marketplace plugin providing AI-powered content generation skills. Version: **2.0.0**.
+Claude Code marketplace plugin providing AI-powered content generation skills. Version: **2.7.0**. The repository ships **48 skills** and the same `skills/` tree is consumable by Claude Code, Codex, Trae, WorkBuddy, CodeBuddy and Gemini CLI. Default branch: `main` (Markdown, no `#md` branch needed).
 
 > **Bonin AIGC** — *Empower Super-Individuals and Super-Teams*
 > Website: [boninaigc.top](https://www.boninaigc.top) | Email: boninaigc@gmail.com | GitHub: [BoninEDU](https://github.com/BoninEDU)
